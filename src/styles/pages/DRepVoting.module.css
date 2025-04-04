@@ -1,0 +1,101 @@
+.container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+
+.description {
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+.error {
+    padding: 1rem;
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    color: #991b1b;
+    margin: 1rem 0;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #eaeaea;
+    text-align: center;
+}
+
+.stat h3 {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0 0 0.5rem 0;
+}
+
+.stat p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.stat p.yes {
+    color: #166534;
+}
+
+.stat p.no {
+    color: #991b1b;
+}
+
+.stat p.abstain {
+    color: #4b5563;
+}
+
+.typeStats {
+    margin: 2rem 0;
+}
+
+.typeStats h2 {
+    font-size: 1.25rem;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.typeGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.typeStat {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #eaeaea;
+}
+
+.typeStat h4 {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0 0 0.5rem 0;
+}
+
+.typeStat p {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
