@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
 import fetchData from '../lib/fetchData';
 import DRepVotingList from '../components/DRepVotingList';
-import styles from '../styles/pages/DRepVoting.module.css';
+import styles from '../styles/Voting.module.css';
 
 interface VoteData {
     proposalId: string;

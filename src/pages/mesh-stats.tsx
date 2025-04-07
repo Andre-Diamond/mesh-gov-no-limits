@@ -1,6 +1,7 @@
 import { GetStaticProps } from 'next';
 import MeshStatsView from '../components/MeshStatsView';
 import fetchData from '../lib/fetchData';
+import styles from '../styles/MeshStats.module.css';
 
 interface MeshStatsPageProps {
     currentStats: any;
@@ -42,16 +43,20 @@ export const getStaticProps: GetStaticProps<MeshStatsPageProps> = async () => {
 export default function MeshStatsPage({ currentStats, stats2024, stats2025, error }: MeshStatsPageProps) {
     if (error) {
         return (
-            <div className="error-container">
-                <p className="error-message">{error}</p>
+            <div className={styles.container}>
+                <div className={styles.stat}>
+                    <p className={styles.error}>{error}</p>
+                </div>
             </div>
         );
     }
 
     if (!currentStats || !stats2024 || !stats2025) {
         return (
-            <div className="loading-container">
-                <p>Loading mesh statistics...</p>
+            <div className={styles.container}>
+                <div className={styles.stat}>
+                    <p>Loading mesh statistics...</p>
+                </div>
             </div>
         );
     }

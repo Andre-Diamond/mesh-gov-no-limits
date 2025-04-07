@@ -1,13 +1,16 @@
 import { FC } from 'react';
-import styles from '../styles/DRepVotingList.module.css';
+import styles from '../styles/Voting.module.css';
 
-// Format date consistently without relying on locale settings
+// Format date to a readable format
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    return `${year}/${month}/${day}`;
+    return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(date);
 };
 
 interface VoteData {
@@ -36,10 +39,10 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes }) => {
     }
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} data-testid="voting-list">
             <ul className={styles.list}>
                 {votes.map((vote) => (
-                    <li key={vote.proposalId} className={styles.item}>
+                    <li key={vote.proposalId} className={styles.item} data-testid="vote-item">
                         <div className={styles.header}>
                             <h3 className={styles.title}>{vote.proposalTitle}</h3>
                             <span className={`${styles.vote} ${styles[vote.vote.toLowerCase()]}`}>

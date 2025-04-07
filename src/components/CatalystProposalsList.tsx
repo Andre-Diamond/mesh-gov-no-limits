@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import styles from '../styles/CatalystProposalsList.module.css';
+import styles from '../styles/Proposals.module.css';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
@@ -52,7 +52,7 @@ const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data }) => {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} data-testid="proposals-list">
             <table className={styles.table}>
                 <thead>
                     <tr>
@@ -66,10 +66,16 @@ const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data }) => {
                 </thead>
                 <tbody>
                     {data.projects.map((project) => (
-                        <tr key={project.projectDetails.id}>
+                        <tr key={project.projectDetails.id} data-testid="proposal-item">
                             <td>{project.projectDetails.title}</td>
                             <td>{formatAda(project.projectDetails.budget)}</td>
-                            <td>{project.projectDetails.status}</td>
+                            <td>
+                                <span className={`${styles.status} ${project.projectDetails.status === 'Completed' ? styles.completed :
+                                    project.projectDetails.status === 'In Progress' ? styles.inProgress : styles.onHold
+                                    }`}>
+                                    {project.projectDetails.status}
+                                </span>
+                            </td>
                             <td>{project.projectDetails.milestones_qty === 0 ? '0' : Math.round((project.milestonesCompleted / project.projectDetails.milestones_qty) * 100)}%</td>
                             <td>{project.projectDetails.category}</td>
                             <td>{formatAda(project.projectDetails.funds_distributed)}</td>

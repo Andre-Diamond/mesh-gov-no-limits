@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import styles from '../styles/MeshStatsView.module.css';
+import styles from '../styles/MeshStats.module.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface Downloads {
@@ -60,7 +60,7 @@ interface MeshStatsViewProps {
 }
 
 const formatNumber = (num: number): string => {
-    return num.toLocaleString('en-US');
+    return new Intl.NumberFormat('en-US').format(num);
 };
 
 const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, stats2024, stats2025 }) => {
@@ -81,7 +81,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, stats2024, stats2
     }));
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} data-testid="mesh-stats-view">
             <div className={styles.header}>
                 <h1 className={styles.title}>Mesh SDK Statistics</h1>
                 <p className={styles.version}>Latest Version: {currentStats.npm.latest_version}</p>
@@ -156,7 +156,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, stats2024, stats2
                 </div>
             </div>
 
-            <div className={styles.yearlyComparison}>
+            <div className={styles.chartSection}>
                 <h2>Yearly Comparison</h2>
                 <div className={styles.yearGrid}>
                     <div className={styles.year}>

@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
 import fetchData from '../lib/fetchData';
 import CatalystProposalsList from '../components/CatalystProposalsList';
-import styles from '../styles/pages/CatalystProposals.module.css';
+import styles from '../styles/Proposals.module.css';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
@@ -43,8 +43,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     try {
         const data = await fetchData('https://raw.githubusercontent.com/Signius/mesh-automations/main/mesh-gov-updates/catalyst-proposals/catalyst-data.json');
         return {
-            props: { data },
-            revalidate: 60 * 60 * 24 * 7, // 7 days
+            props: { data }
         };
     } catch (error) {
         console.error('Failed to fetch Catalyst data:', error);
@@ -54,8 +53,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
                     timestamp: new Date().toISOString(),
                     projects: []
                 }
-            },
-            revalidate: 60 * 60 // Retry every hour if there was an error
+            }
         };
     }
 };
