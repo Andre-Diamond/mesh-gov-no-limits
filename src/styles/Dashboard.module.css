@@ -1,0 +1,253 @@
+.container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title span {
+    color: var(--status-blue);
+}
+
+.liveIndicator {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background-color: rgba(12, 242, 180, 0.1);
+    border: 1px solid rgba(12, 242, 180, 0.2);
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    color: var(--status-green);
+    margin-left: 1rem;
+}
+
+.liveIndicator::before {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--status-green);
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+.refresh {
+    background: none;
+    border: none;
+    color: var(--status-blue);
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: transform 0.2s;
+}
+
+.refresh:hover {
+    transform: rotate(30deg);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: var(--sidebar-bg);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.cardTitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cardIcon {
+    font-size: 1.25rem;
+    color: var(--status-blue);
+}
+
+.value {
+    font-size: 2.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.subValue {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.chart {
+    height: 400px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0.75rem;
+    background-color: var(--sidebar-bg);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--box-shadow);
+}
+
+.tabContainer {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.tab {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+}
+
+.tabActive {
+    background-color: var(--sidebar-active);
+    color: var(--status-blue);
+}
+
+.cardGlow::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--status-blue), var(--status-green));
+    z-index: -1;
+    border-radius: 0.85rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.card:hover .cardGlow::before {
+    opacity: 0.25;
+}
+
+.statusList {
+    margin-top: 2rem;
+}
+
+.statusItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--sidebar-bg);
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s;
+}
+
+.statusItem:hover {
+    transform: translateX(3px);
+}
+
+.statusLabel {
+    display: flex;
+    align-items: center;
+}
+
+.statusIcon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+}
+
+.statusIconGreen {
+    background-color: var(--status-green);
+}
+
+.statusIconYellow {
+    background-color: var(--status-yellow);
+}
+
+.statusIconRed {
+    background-color: var(--status-red);
+}
+
+.statusIconBlue {
+    background-color: var(--status-blue);
+}
+
+.statusText {
+    font-size: 0.9375rem;
+    color: var(--text-color);
+}
+
+.statusTime {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

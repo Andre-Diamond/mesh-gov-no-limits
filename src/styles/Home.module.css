@@ -1,0 +1,125 @@
+.container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pageHeader {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.description {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.content {
+    width: 100%;
+}
+
+.chartContainer,
+.tableContainer {
+    margin-bottom: 2rem;
+}
+
+.chartContainer h2,
+.tableContainer h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.placeholder {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background-color: var(--light-bg);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.dataDisplay {
+    margin-top: 2rem;
+    background-color: var(--sidebar-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.dataDisplay h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.dataDisplay pre {
+    background-color: var(--item-hover);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.loading,
+.error {
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+    background-color: var(--sidebar-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.error {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .placeholder {
+        padding: 1.5rem;
+        min-height: 150px;
+    }
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .chartContainer h2,
+    .tableContainer h2,
+    .dataDisplay h2 {
+        font-size: 1.125rem;
+    }
+}

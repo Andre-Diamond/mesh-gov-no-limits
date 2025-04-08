@@ -63,8 +63,10 @@ export default function CatalystProposals() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>Catalyst Proposals</h1>
-            <p className={styles.description}>View and analyze Catalyst proposals here.</p>
+            <div className={styles.pageHeader}>
+                <h1 className={styles.title}>Catalyst Proposals</h1>
+                <p className={styles.description}>View and analyze Catalyst proposals here.</p>
+            </div>
 
             <div className={styles.stats} role="region" aria-label="statistics">
                 <div className={styles.stat}>

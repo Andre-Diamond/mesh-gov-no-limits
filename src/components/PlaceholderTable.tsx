@@ -1,14 +1,15 @@
-export default function PlaceholderTable() {
+import React from 'react';
+import styles from '../styles/Home.module.css';
+
+const PlaceholderTable: React.FC = () => {
     return (
-        <div style={{
-            border: '2px dashed #ccc',
-            borderRadius: '8px',
-            padding: '2rem',
-            margin: '1rem 0',
-            textAlign: 'center',
-            backgroundColor: '#f5f5f5'
-        }}>
-            Table goes here
+        <div className={styles.tableContainer}>
+            <h2>Governance Statistics</h2>
+            <div className={styles.placeholder}>
+                <p>Table data will be displayed here</p>
+            </div>
         </div>
     );
-} 
+};
+
+export default PlaceholderTable; 

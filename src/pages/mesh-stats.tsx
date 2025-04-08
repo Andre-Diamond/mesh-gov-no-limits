@@ -35,5 +35,9 @@ export default function MeshStatsPage() {
         );
     }
 
-    return <MeshStatsView currentStats={meshData.currentStats} yearlyStats={meshData.yearlyStats} />;
+    return (
+        <div className={styles.container}>
+            <MeshStatsView currentStats={meshData.currentStats} yearlyStats={meshData.yearlyStats} />
+        </div>
+    );
 } 

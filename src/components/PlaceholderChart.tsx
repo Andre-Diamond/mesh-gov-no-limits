@@ -1,14 +1,15 @@
-export default function PlaceholderChart() {
+import React from 'react';
+import styles from '../styles/Home.module.css';
+
+const PlaceholderChart: React.FC = () => {
     return (
-        <div style={{
-            border: '2px dashed #ccc',
-            borderRadius: '8px',
-            padding: '2rem',
-            margin: '1rem 0',
-            textAlign: 'center',
-            backgroundColor: '#f5f5f5'
-        }}>
-            Chart goes here
+        <div className={styles.chartContainer}>
+            <h2>Mesh Ecosystem Overview</h2>
+            <div className={styles.placeholder}>
+                <p>Chart visualization will be displayed here</p>
+            </div>
         </div>
     );
-} 
+};
+
+export default PlaceholderChart; 

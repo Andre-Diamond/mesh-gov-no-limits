@@ -53,8 +53,10 @@ export default function DRepVoting() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>DRep Voting Dashboard</h1>
-            <p className={styles.description}>Track and analyze DRep voting patterns here.</p>
+            <div className={styles.pageHeader}>
+                <h1 className={styles.title}>DRep Voting Dashboard</h1>
+                <p className={styles.description}>Track and analyze DRep voting patterns here.</p>
+            </div>
 
             <div className={styles.stats} data-testid="voting-stats">
                 <div className={styles.stat}>
