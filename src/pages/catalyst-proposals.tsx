@@ -65,7 +65,7 @@ export default function CatalystProposals() {
     return (
         <div className={styles.container}>
             <PageHeader
-                title="Catalyst Proposals"
+                title={<>Catalyst Proposal <span>Dashboard</span></>}
                 subtitle="View and analyze Catalyst proposals here."
             />
 

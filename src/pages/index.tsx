@@ -1,8 +1,8 @@
 import { useData } from '../contexts/DataContext';
-import styles from '../styles/Home.module.css';
-import dashboardStyles from '../styles/Dashboard.module.css';
+import styles from '../styles/Dashboard.module.css';
 import { useRouter } from 'next/router';
 import PageHeader from '../components/PageHeader';
+import StatusCard, { StatusIconType } from '../components/StatusCard';
 
 // Simple number formatting function
 const formatNumber = (num: number): string => {
@@ -111,109 +111,55 @@ export default function Home() {
         .sort((a: ProjectWithCompletion, b: ProjectWithCompletion) => b.completionPercentage - a.completionPercentage)
         .slice(0, 3) || [];
 
-    // Header actions - refresh button
-    const headerActions = (
-        <button
-            className={dashboardStyles.refresh}
-            onClick={() => refetchData()}
-            title="Refresh data"
-        >
-            ↺
-        </button>
-    );
-
     return (
         <div className={styles.container}>
             <PageHeader
                 title={<>Mesh Governance <span>Dashboard</span></>}
-                subtitle="Real-time metrics and insights for the Cardano ecosystem"
-                actions={
-                    <>
-                        <div className={dashboardStyles.liveIndicator}>LIVE DATA</div>
-                        {headerActions}
-                    </>
-                }
+                subtitle="Comprehensive overview of all MeshJS ecosystem activities"
             />
 
             {/* Top metrics */}
-            <div className={dashboardStyles.grid}>
-                {/* Proposals Card */}
-                <div className={dashboardStyles.card}>
-                    <div className={dashboardStyles.cardHeader}>
-                        <div className={dashboardStyles.cardTitle}>CATALYST PROPOSALS</div>
-                        <div className={dashboardStyles.cardIcon}>📊</div>
-                    </div>
-                    <div className={dashboardStyles.value}>{totalProposals}</div>
-                    <div className={dashboardStyles.subValue}>
-                        {completedProposals} completed ({Math.round((completedProposals / totalProposals) * 100)}%)
-                    </div>
-                    <button
-                        className={styles.viewMore}
-                        onClick={() => router.push('/catalyst-proposals')}
-                    >
-                        View details →
-                    </button>
-                </div>
+            <div className={styles.statusList}>
+                <h2>Key Metrics</h2>
 
                 {/* Voting Card */}
-                <div className={dashboardStyles.card}>
-                    <div className={dashboardStyles.cardHeader}>
-                        <div className={dashboardStyles.cardTitle}>TOTAL VOTES</div>
-                        <div className={dashboardStyles.cardIcon}>🗳️</div>
-                    </div>
-                    <div className={dashboardStyles.value}>{totalVotes}</div>
-                    <div className={dashboardStyles.subValue}>
-                        Latest vote: {recentVotes[0] ? formatDate(recentVotes[0].blockTime) : 'N/A'}
-                    </div>
-                    <button
-                        className={styles.viewMore}
-                        onClick={() => router.push('/drep-voting')}
-                    >
-                        View details →
-                    </button>
-                </div>
+                <StatusCard
+                    title={`TOTAL VOTES: ${totalVotes}`}
+                    iconType="green"
+                    subtitle={`Latest vote: ${recentVotes[0] ? formatDate(recentVotes[0].blockTime) : 'N/A'}`}
+                    actionLabel="View details →"
+                    onActionClick={() => router.push('/drep-voting')}
+                />
+
+                {/* Proposals Card */}
+                <StatusCard
+                    title={`CATALYST PROPOSALS: ${totalProposals}`}
+                    iconType="blue"
+                    subtitle={`${completedProposals} completed (${Math.round((completedProposals / totalProposals) * 100)}%)`}
+                    actionLabel="View details →"
+                    onActionClick={() => router.push('/catalyst-proposals')}
+                />
 
                 {/* SDK Downloads Card */}
-                <div className={dashboardStyles.card}>
-                    <div className={dashboardStyles.cardHeader}>
-                        <div className={dashboardStyles.cardTitle}>SDK DOWNLOADS</div>
-                        <div className={dashboardStyles.cardIcon}>📦</div>
-                    </div>
-                    <div className={dashboardStyles.value}>
-                        {downloads ? formatNumber(downloads.last_month) : 'N/A'}
-                    </div>
-                    <div className={dashboardStyles.subValue}>
-                        This month • {githubUsage} projects using Mesh
-                    </div>
-                    <button
-                        className={styles.viewMore}
-                        onClick={() => router.push('/mesh-stats')}
-                    >
-                        View details →
-                    </button>
-                </div>
+                <StatusCard
+                    title={`SDK DOWNLOADS: ${downloads ? formatNumber(downloads.last_month) : 'N/A'}`}
+                    iconType="yellow"
+                    subtitle={`This month • ${githubUsage} projects using Mesh`}
+                    actionLabel="View details →"
+                    onActionClick={() => router.push('/mesh-stats')}
+                />
             </div>
 
             {/* Recent Votes */}
-            <div className={dashboardStyles.statusList}>
+            <div className={styles.statusList}>
                 <h2>Recent Votes</h2>
                 {recentVotes.map((vote: VoteData) => (
-                    <div key={vote.proposalId} className={dashboardStyles.statusItem}>
-                        <div className={dashboardStyles.statusLabel}>
-                            <div className={`${dashboardStyles.statusIcon} ${vote.vote === 'Yes'
-                                ? dashboardStyles.statusIconGreen
-                                : vote.vote === 'No'
-                                    ? dashboardStyles.statusIconRed
-                                    : dashboardStyles.statusIconYellow
-                                }`}></div>
-                            <div className={dashboardStyles.statusText}>
-                                {vote.proposalTitle} - <strong>{vote.vote}</strong>
-                            </div>
-                        </div>
-                        <div className={dashboardStyles.statusTime}>
-                            {formatDate(vote.blockTime)}
-                        </div>
-                    </div>
+                    <StatusCard
+                        key={vote.proposalId}
+                        title={vote.proposalTitle}
+                        iconType={vote.vote === 'Yes' ? 'green' : vote.vote === 'No' ? 'red' : 'yellow'}
+                        subtitle={`Vote: ${vote.vote} • ${formatDate(vote.blockTime)}`}
+                    />
                 ))}
                 {recentVotes.length === 0 && (
                     <div className={styles.empty}>No voting data available</div>
@@ -221,23 +167,15 @@ export default function Home() {
             </div>
 
             {/* Projects Near Completion */}
-            <div className={dashboardStyles.statusList}>
+            <div className={styles.statusList}>
                 <h2>Projects Near Completion</h2>
                 {projectsNearCompletion.map((project: ProjectWithCompletion) => (
-                    <div key={project.projectDetails.id} className={dashboardStyles.statusItem}>
-                        <div className={dashboardStyles.statusLabel}>
-                            <div className={`${dashboardStyles.statusIcon} ${project.projectDetails.status === 'In Progress'
-                                ? dashboardStyles.statusIconBlue
-                                : dashboardStyles.statusIconYellow
-                                }`}></div>
-                            <div className={dashboardStyles.statusText}>
-                                {project.projectDetails.title}
-                            </div>
-                        </div>
-                        <div className={dashboardStyles.statusTime}>
-                            {project.completionPercentage}% complete • {project.projectDetails.category} • ₳{formatNumber(project.projectDetails.budget)}
-                        </div>
-                    </div>
+                    <StatusCard
+                        key={project.projectDetails.id}
+                        title={project.projectDetails.title}
+                        iconType={project.projectDetails.status === 'In Progress' ? 'blue' : 'yellow'}
+                        subtitle={`${project.completionPercentage}% complete • ${project.projectDetails.category} • ₳${formatNumber(project.projectDetails.budget)}`}
+                    />
                 ))}
                 {projectsNearCompletion.length === 0 && (
                     <div className={styles.empty}>No projects near completion</div>

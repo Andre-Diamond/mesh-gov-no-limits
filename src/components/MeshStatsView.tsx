@@ -92,16 +92,12 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) =>
     return (
         <div data-testid="mesh-stats-view">
             <PageHeader
-                title="Mesh SDK Statistics"
+                title={<>Mesh SDK <span>Statistics</span></>}
                 subtitle={versionSubtitle}
             />
 
             {currentStats?.npm?.downloads && (
                 <div className={styles.statsGrid}>
-                    <div className={styles.stat}>
-                        <h3>Last 24 Hours</h3>
-                        <p>{formatNumber(currentStats.npm.downloads.last_day)}</p>
-                    </div>
                     <div className={styles.stat}>
                         <h3>Last Week</h3>
                         <p>{formatNumber(currentStats.npm.downloads.last_week)}</p>

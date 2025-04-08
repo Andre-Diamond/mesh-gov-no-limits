@@ -55,7 +55,7 @@ export default function DRepVoting() {
     return (
         <div className={styles.container}>
             <PageHeader
-                title="DRep Voting Dashboard"
+                title={<>DRep Voting <span>Dashboard</span></>}
                 subtitle="Track and analyze DRep voting patterns here."
             />
 
