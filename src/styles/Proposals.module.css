@@ -1,20 +1,25 @@
 .container {
     width: 100%;
     overflow-x: auto;
-    padding: 2rem;
-    max-width: 1400px;
+    padding: 1.5rem;
+    max-width: 1200px;
     margin: 0 auto;
+}
+
+.pageHeader {
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
 .title {
     font-size: 2rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.5rem;
-    color: #111827;
+    color: var(--text-color);
 }
 
 .description {
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
 }
 
@@ -26,22 +31,24 @@
 }
 
 .stat {
-    background-color: white;
+    background-color: var(--sidebar-bg);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #eaeaea;
+    border: 1px solid var(--border-color);
+    text-align: center;
 }
 
 .stat h3 {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin: 0 0 0.5rem 0;
+    font-weight: 500;
 }
 
 .stat p {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color);
     margin: 0;
 }
 
@@ -56,17 +63,17 @@
 .table td {
     padding: 0.75rem 1rem;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .table th {
-    background-color: #f9fafb;
+    background-color: var(--item-hover);
     font-weight: 600;
-    color: #374151;
+    color: var(--text-color);
 }
 
 .table tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--item-hover);
 }
 
 /* Status colors */
@@ -78,25 +85,40 @@
 }
 
 .completed {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--status-green);
 }
 
 .inProgress {
-    background-color: #dbeafe;
-    color: #1e40af;
+    background-color: rgba(59, 130, 246, 0.2);
+    color: var(--status-blue);
 }
 
 .onHold {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--status-yellow);
 }
 
 .timestamp {
     margin-top: 1rem;
     text-align: right;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
+}
+
+.loading,
+.error {
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+    background-color: var(--sidebar-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.error {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -112,15 +134,22 @@
     .stats {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .title {
+        font-size: 1.75rem;
+    }
 }
 
 @media (max-width: 640px) {
     .container {
-        margin: 0 -1rem;
         padding: 1rem;
     }
 
     .stats {
         grid-template-columns: 1fr;
+    }
+
+    .title {
+        font-size: 1.5rem;
     }
 }

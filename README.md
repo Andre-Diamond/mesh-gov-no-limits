@@ -17,7 +17,6 @@ The data is automatically refreshed weekly through Incremental Static Regenerati
 - **Catalyst Proposals**: Track funded proposals, budget distribution, and milestone progress
 - **DRep Voting**: View voting history, rationales, and epoch information
 - **Mesh Stats**: Monitor SDK usage trends, GitHub contributions, and dependency statistics
-- **Auto-Refresh**: Data updates every Friday morning via ISR
 - **Responsive Design**: Mobile-friendly interface with modern UI/UX
 
 ## 🛠️ Tech Stack

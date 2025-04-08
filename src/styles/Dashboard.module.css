@@ -1,0 +1,531 @@
+.container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title span {
+    color: var(--status-blue);
+}
+
+.liveIndicator {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background-color: rgba(12, 242, 180, 0.1);
+    border: 1px solid rgba(12, 242, 180, 0.2);
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    color: var(--status-green);
+    margin-left: 1rem;
+}
+
+.liveIndicator::before {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--status-green);
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+.refresh {
+    background: none;
+    border: none;
+    color: var(--status-blue);
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: transform 0.2s;
+}
+
+.refresh:hover {
+    transform: rotate(30deg);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: var(--sidebar-bg);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.cardTitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cardIcon {
+    font-size: 1.25rem;
+    color: var(--status-blue);
+}
+
+.value {
+    font-size: 2.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.subValue {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.chart {
+    height: 400px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0.75rem;
+    background-color: var(--sidebar-bg);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--box-shadow);
+}
+
+.tabContainer {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.tab {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+}
+
+.tabActive {
+    background-color: var(--sidebar-active);
+    color: var(--status-blue);
+}
+
+.cardGlow::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--status-blue), var(--status-green));
+    z-index: -1;
+    border-radius: 0.85rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.card:hover .cardGlow::before {
+    opacity: 0.25;
+}
+
+.statusList {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.statusList h2 {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.statusItem {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    background-color: var(--sidebar-bg);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    flex: 1;
+    min-width: calc(33% - 1rem);
+    max-width: calc(33% - 1rem);
+    min-height: 150px;
+}
+
+.statusItem:hover {
+    transform: translateX(3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-color: var(--status-blue);
+}
+
+.statusItemContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    width: 100%;
+}
+
+.statusItemTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.25rem;
+    width: 100%;
+    min-height: 42px;
+}
+
+.statusItemBottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+    width: 100%;
+    min-height: 22px;
+}
+
+.statusLabel {
+    display: flex;
+    align-items: flex-start;
+    flex: 1;
+    padding-right: 15px;
+}
+
+.statusIcon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.statusIconGreen {
+    background-color: var(--status-green);
+    box-shadow: 0 0 8px rgba(12, 242, 180, 0.5);
+}
+
+.statusIconYellow {
+    background-color: var(--status-yellow);
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+}
+
+.statusIconRed {
+    background-color: var(--status-red);
+    box-shadow: 0 0 8px rgba(255, 76, 76, 0.5);
+}
+
+.statusIconBlue {
+    background-color: var(--status-blue);
+    box-shadow: 0 0 8px rgba(16, 132, 255, 0.5);
+}
+
+.statusTitle {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text-color);
+    margin-bottom: 0.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.3;
+    height: 2.34rem;
+}
+
+.statusValue {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 2.1rem;
+    margin-top: 0.1rem;
+}
+
+.statusSubtext {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.3;
+}
+
+.statusTime {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.statusItemRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+/* Home page styles merged from Home.module.css */
+.pageHeader {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.description {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.content {
+    width: 100%;
+}
+
+.chartContainer,
+.tableContainer {
+    margin-bottom: 2rem;
+}
+
+.chartContainer h2,
+.tableContainer h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.placeholder {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background-color: var(--light-bg);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.dataDisplay {
+    margin-top: 2rem;
+    background-color: var(--sidebar-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.dataDisplay h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.dataDisplay pre {
+    background-color: var(--item-hover);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.loading,
+.error {
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+    background-color: var(--sidebar-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.error {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.empty {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.viewMore {
+    display: block;
+    margin-top: 1rem;
+    padding: 0.5rem 0;
+    background: none;
+    border: none;
+    color: var(--status-blue);
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-align: right;
+    width: 100%;
+    transition: opacity 0.2s;
+}
+
+.viewMore:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.statusItemRight .viewMore {
+    margin-top: 0.25rem;
+    padding: 0;
+    text-align: right;
+}
+
+/* Media Queries - merged from both files */
+@media (max-width: 968px) {
+    .statusItem {
+        min-width: calc(50% - 1rem);
+        max-width: calc(50% - 1rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .placeholder {
+        padding: 1.5rem;
+        min-height: 150px;
+    }
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .chartContainer h2,
+    .tableContainer h2,
+    .dataDisplay h2 {
+        font-size: 1.125rem;
+    }
+
+    .statusItem {
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+.clickableCard {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.clickableCard:hover {
+    background-color: rgba(var(--sidebar-active-rgb, 15, 23, 42), 0.05);
+}
+
+.clickableCard::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 6px;
+    height: 6px;
+    border-top: 2px solid var(--text-secondary);
+    border-right: 2px solid var(--text-secondary);
+    transform: rotate(45deg);
+    opacity: 0.4;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.clickableCard:hover::after {
+    opacity: 0.7;
+    right: 8px;
+}

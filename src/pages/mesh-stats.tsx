@@ -1,46 +1,20 @@
-import { GetStaticProps } from 'next';
 import MeshStatsView from '../components/MeshStatsView';
-import fetchData from '../lib/fetchData';
+import { useData } from '../contexts/DataContext';
 import styles from '../styles/MeshStats.module.css';
 
-interface MeshStatsPageProps {
-    currentStats: any;
-    stats2024: any;
-    stats2025: any;
-    error?: string;
-}
+export default function MeshStatsPage() {
+    const { meshData, isLoading, error } = useData();
 
-export const getStaticProps: GetStaticProps<MeshStatsPageProps> = async () => {
-    try {
-        const [currentStats, stats2024, stats2025] = await Promise.all([
-            fetchData('https://raw.githubusercontent.com/Signius/mesh-automations/main/mesh-gov-updates/mesh-stats/mesh_stats.json'),
-            fetchData('https://raw.githubusercontent.com/Signius/mesh-automations/main/mesh-gov-updates/mesh-stats/mesh-yearly-stats-2024.json'),
-            fetchData('https://raw.githubusercontent.com/Signius/mesh-automations/main/mesh-gov-updates/mesh-stats/mesh-yearly-stats-2025.json')
-        ]);
-
-        return {
-            props: {
-                currentStats,
-                stats2024,
-                stats2025
-            },
-            revalidate: 60 * 60 * 24 // Revalidate daily
-        };
-    } catch (error) {
-        console.error('Error fetching mesh stats:', error);
-        return {
-            props: {
-                currentStats: null,
-                stats2024: null,
-                stats2025: null,
-                error: 'Failed to load mesh statistics'
-            },
-            revalidate: 60 * 60 // Retry every hour if there was an error
-        };
+    if (isLoading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.stat}>
+                    <p>Loading mesh statistics...</p>
+                </div>
+            </div>
+        );
     }
-};
 
-export default function MeshStatsPage({ currentStats, stats2024, stats2025, error }: MeshStatsPageProps) {
     if (error) {
         return (
             <div className={styles.container}>
@@ -51,15 +25,19 @@ export default function MeshStatsPage({ currentStats, stats2024, stats2025, erro
         );
     }
 
-    if (!currentStats || !stats2024 || !stats2025) {
+    if (!meshData?.currentStats || !meshData?.yearlyStats || Object.keys(meshData.yearlyStats).length === 0) {
         return (
             <div className={styles.container}>
                 <div className={styles.stat}>
-                    <p>Loading mesh statistics...</p>
+                    <p>No mesh statistics available</p>
                 </div>
             </div>
         );
     }
 
-    return <MeshStatsView currentStats={currentStats} stats2024={stats2024} stats2025={stats2025} />;
+    return (
+        <div className={styles.container}>
+            <MeshStatsView currentStats={meshData.currentStats} yearlyStats={meshData.yearlyStats} />
+        </div>
+    );
 } 
