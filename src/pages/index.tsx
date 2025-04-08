@@ -124,29 +124,29 @@ export default function Home() {
 
                 {/* Voting Card */}
                 <StatusCard
-                    title={`TOTAL VOTES: ${totalVotes}`}
+                    title="Total Votes"
+                    value={totalVotes}
                     iconType="green"
                     subtitle={`Latest vote: ${recentVotes[0] ? formatDate(recentVotes[0].blockTime) : 'N/A'}`}
-                    actionLabel="View details →"
-                    onActionClick={() => router.push('/drep-voting')}
+                    href="/drep-voting"
                 />
 
                 {/* Proposals Card */}
                 <StatusCard
-                    title={`CATALYST PROPOSALS: ${totalProposals}`}
+                    title="Catalyst Proposals"
+                    value={totalProposals}
                     iconType="blue"
                     subtitle={`${completedProposals} completed (${Math.round((completedProposals / totalProposals) * 100)}%)`}
-                    actionLabel="View details →"
-                    onActionClick={() => router.push('/catalyst-proposals')}
+                    href="/catalyst-proposals"
                 />
 
                 {/* SDK Downloads Card */}
                 <StatusCard
-                    title={`SDK DOWNLOADS: ${downloads ? formatNumber(downloads.last_month) : 'N/A'}`}
+                    title="SDK Downloads"
+                    value={downloads ? formatNumber(downloads.last_month) : 'N/A'}
                     iconType="yellow"
                     subtitle={`This month • ${githubUsage} projects using Mesh`}
-                    actionLabel="View details →"
-                    onActionClick={() => router.push('/mesh-stats')}
+                    href="/mesh-stats"
                 />
             </div>
 
@@ -157,8 +157,10 @@ export default function Home() {
                     <StatusCard
                         key={vote.proposalId}
                         title={vote.proposalTitle}
+                        value={vote.vote}
                         iconType={vote.vote === 'Yes' ? 'green' : vote.vote === 'No' ? 'red' : 'yellow'}
-                        subtitle={`Vote: ${vote.vote} • ${formatDate(vote.blockTime)}`}
+                        subtitle={`${formatDate(vote.blockTime)}`}
+                        href={`/vote-details/${vote.proposalId}`}
                     />
                 ))}
                 {recentVotes.length === 0 && (
@@ -173,8 +175,10 @@ export default function Home() {
                     <StatusCard
                         key={project.projectDetails.id}
                         title={project.projectDetails.title}
+                        value={`${project.completionPercentage}%`}
                         iconType={project.projectDetails.status === 'In Progress' ? 'blue' : 'yellow'}
-                        subtitle={`${project.completionPercentage}% complete • ${project.projectDetails.category} • ₳${formatNumber(project.projectDetails.budget)}`}
+                        subtitle={`${project.projectDetails.category} • ₳${formatNumber(project.projectDetails.budget)}`}
+                        href={`/project-details/${project.projectDetails.project_id}`}
                     />
                 ))}
                 {projectsNearCompletion.length === 0 && (

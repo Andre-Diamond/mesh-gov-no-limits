@@ -173,34 +173,53 @@
 
 .statusList {
     margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.statusList h2 {
+    width: 100%;
+    margin-bottom: 1rem;
 }
 
 .statusItem {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
     background-color: var(--sidebar-bg);
-    margin-bottom: 0.75rem;
     border: 1px solid var(--border-color);
-    transition: transform 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    flex: 1;
+    min-width: calc(33% - 1rem);
+    max-width: calc(33% - 1rem);
+    min-height: 150px;
 }
 
 .statusItem:hover {
     transform: translateX(3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-color: var(--status-blue);
 }
 
 .statusItemContent {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    height: 100%;
+    width: 100%;
 }
 
 .statusItemTop {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    width: 100%;
+    min-height: 42px;
 }
 
 .statusItemBottom {
@@ -209,55 +228,83 @@
     align-items: flex-end;
     margin-top: auto;
     width: 100%;
+    min-height: 22px;
 }
 
 .statusLabel {
     display: flex;
-    align-items: center;
-    width: 100%;
+    align-items: flex-start;
+    flex: 1;
+    padding-right: 15px;
 }
 
 .statusIcon {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    margin-right: 0.75rem;
     flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .statusIconGreen {
     background-color: var(--status-green);
+    box-shadow: 0 0 8px rgba(12, 242, 180, 0.5);
 }
 
 .statusIconYellow {
     background-color: var(--status-yellow);
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
 }
 
 .statusIconRed {
     background-color: var(--status-red);
+    box-shadow: 0 0 8px rgba(255, 76, 76, 0.5);
 }
 
 .statusIconBlue {
     background-color: var(--status-blue);
+    box-shadow: 0 0 8px rgba(16, 132, 255, 0.5);
 }
 
-.statusText {
-    font-size: 1.125rem;
-    font-weight: 600;
+.statusTitle {
+    font-size: 0.875rem;
+    font-weight: 400;
     color: var(--text-color);
-    white-space: nowrap;
+    margin-bottom: 0.1rem;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.3;
+    height: 2.34rem;
+}
+
+.statusValue {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 2.1rem;
+    margin-top: 0.1rem;
 }
 
 .statusSubtext {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--text-secondary);
-    margin-left: 1.75rem;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex: 1;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    line-height: 1.3;
 }
 
 .statusTime {
@@ -410,6 +457,13 @@
 }
 
 /* Media Queries - merged from both files */
+@media (max-width: 968px) {
+    .statusItem {
+        min-width: calc(50% - 1rem);
+        max-width: calc(50% - 1rem);
+    }
+}
+
 @media (max-width: 768px) {
     .grid {
         grid-template-columns: 1fr;
@@ -439,4 +493,39 @@
     .dataDisplay h2 {
         font-size: 1.125rem;
     }
+
+    .statusItem {
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+.clickableCard {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.clickableCard:hover {
+    background-color: rgba(var(--sidebar-active-rgb, 15, 23, 42), 0.05);
+}
+
+.clickableCard::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 6px;
+    height: 6px;
+    border-top: 2px solid var(--text-secondary);
+    border-right: 2px solid var(--text-secondary);
+    transform: rotate(45deg);
+    opacity: 0.4;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.clickableCard:hover::after {
+    opacity: 0.7;
+    right: 8px;
 }
