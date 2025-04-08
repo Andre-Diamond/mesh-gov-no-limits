@@ -10,11 +10,11 @@
     font-size: 2rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #111827;
+    color: var(--text-color);
 }
 
 .description {
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
 }
 
@@ -26,22 +26,22 @@
 }
 
 .stat {
-    background-color: white;
+    background-color: var(--sidebar-bg);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #eaeaea;
+    border: 1px solid var(--border-color);
 }
 
 .stat h3 {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin: 0 0 0.5rem 0;
 }
 
 .stat p {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color);
     margin: 0;
 }
 
@@ -56,17 +56,17 @@
 .table td {
     padding: 0.75rem 1rem;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .table th {
-    background-color: #f9fafb;
+    background-color: var(--item-hover);
     font-weight: 600;
-    color: #374151;
+    color: var(--text-color);
 }
 
 .table tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--item-hover);
 }
 
 /* Status colors */
@@ -78,25 +78,25 @@
 }
 
 .completed {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
 }
 
 .inProgress {
-    background-color: #dbeafe;
-    color: #1e40af;
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
 }
 
 .onHold {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
 }
 
 .timestamp {
     margin-top: 1rem;
     text-align: right;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

@@ -9,11 +9,11 @@
     font-size: 2rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #111827;
+    color: var(--text-color);
 }
 
 .description {
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
 }
 
@@ -34,16 +34,16 @@
 }
 
 .stat {
-    background-color: white;
+    background-color: var(--sidebar-bg);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #eaeaea;
+    border: 1px solid var(--border-color);
     text-align: center;
 }
 
 .stat h3 {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin: 0 0 0.5rem 0;
 }
 
@@ -51,6 +51,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
+    color: var(--text-color);
 }
 
 .stat p.yes {
@@ -71,7 +72,7 @@
 
 .typeStats h2 {
     font-size: 1.25rem;
-    color: #111827;
+    color: var(--text-color);
     margin-bottom: 1rem;
 }
 
@@ -82,22 +83,22 @@
 }
 
 .typeStat {
-    background-color: white;
+    background-color: var(--sidebar-bg);
     padding: 1rem;
     border-radius: 8px;
-    border: 1px solid #eaeaea;
+    border: 1px solid var(--border-color);
 }
 
 .typeStat h4 {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin: 0 0 0.5rem 0;
 }
 
 .typeStat p {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color);
     margin: 0;
 }
 
@@ -112,11 +113,11 @@
 }
 
 .item {
-    background-color: #ffffff;
+    background-color: var(--sidebar-bg);
     border-radius: 0.5rem;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -137,7 +138,7 @@
 .title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color);
     margin: 0;
     line-height: 1.4;
     flex: 1;
@@ -154,30 +155,30 @@
 }
 
 .yes {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
 }
 
 .no {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
 }
 
 .abstain {
-    background-color: #f3f4f6;
-    color: #4b5563;
+    background-color: rgba(107, 114, 128, 0.2);
+    color: var(--text-secondary);
 }
 
 .type {
     font-size: 0.875rem;
-    color: #4b5563;
+    color: var(--text-secondary);
     margin-bottom: 0.75rem;
 }
 
 .rationale {
     font-size: 0.9375rem;
     line-height: 1.5;
-    color: #374151;
+    color: var(--text-color);
     margin: 0 0 1rem 0;
     flex-grow: 1;
 }
@@ -187,7 +188,7 @@
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 0.5rem;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 1rem;
 }
 
@@ -200,8 +201,8 @@
 .link {
     display: inline-block;
     padding: 0.5rem 0.75rem;
-    background-color: #f3f4f6;
-    color: #1f2937;
+    background-color: var(--item-hover);
+    color: var(--text-color);
     text-decoration: none;
     border-radius: 0.25rem;
     font-size: 0.875rem;
@@ -209,13 +210,13 @@
 }
 
 .link:hover {
-    background-color: #e5e7eb;
+    background-color: var(--item-active);
 }
 
 .empty {
     text-align: center;
     padding: 2rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-style: italic;
 }
 
@@ -253,6 +254,9 @@
         width: 100%;
         text-align: center;
     }
+}
+
+@media (max-width: 480px) {
 
     .stats,
     .typeGrid {

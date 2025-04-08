@@ -1,6 +1,5 @@
-import { GetStaticProps } from 'next';
-import fetchData from '../lib/fetchData';
 import CatalystProposalsList from '../components/CatalystProposalsList';
+import { useData } from '../contexts/DataContext';
 import styles from '../styles/Proposals.module.css';
 
 // Simple number formatting function that doesn't rely on locale settings
@@ -13,20 +12,18 @@ const formatAda = (amount: number): string => {
     return `₳${formatNumber(amount)}`;
 };
 
-interface ProjectDetails {
-    id: number;
-    title: string;
-    budget: number;
-    milestones_qty: number;
-    funds_distributed: number;
-    project_id: number;
-    category: string;
-    status: string;
-    finished: string;
-}
-
 interface Project {
-    projectDetails: ProjectDetails;
+    projectDetails: {
+        id: number;
+        title: string;
+        budget: number;
+        milestones_qty: number;
+        funds_distributed: number;
+        project_id: number;
+        category: string;
+        status: string;
+        finished: string;
+    };
     milestonesCompleted: number;
 }
 
@@ -35,30 +32,35 @@ interface CatalystData {
     projects: Project[];
 }
 
-interface Props {
-    data: CatalystData;
-}
+export default function CatalystProposals() {
+    const { catalystData, isLoading, error } = useData();
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
-    try {
-        const data = await fetchData('https://raw.githubusercontent.com/Signius/mesh-automations/main/mesh-gov-updates/catalyst-proposals/catalyst-data.json');
-        return {
-            props: { data }
-        };
-    } catch (error) {
-        console.error('Failed to fetch Catalyst data:', error);
-        return {
-            props: {
-                data: {
-                    timestamp: new Date().toISOString(),
-                    projects: []
-                }
-            }
-        };
+    if (isLoading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.loading}>Loading catalyst data...</div>
+            </div>
+        );
     }
-};
 
-export default function CatalystProposals({ data }: Props) {
+    if (error) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.error}>{error}</div>
+            </div>
+        );
+    }
+
+    if (!catalystData?.catalystData) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.error}>No catalyst data available</div>
+            </div>
+        );
+    }
+
+    const data = catalystData.catalystData;
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Catalyst Proposals</h1>
@@ -71,11 +73,11 @@ export default function CatalystProposals({ data }: Props) {
                 </div>
                 <div className={styles.stat}>
                     <h3>Total Budget</h3>
-                    <p aria-label="Total Budget">{formatAda(data.projects.reduce((sum, p) => sum + p.projectDetails.budget, 0))}</p>
+                    <p aria-label="Total Budget">{formatAda(data.projects.reduce((sum: number, p: Project) => sum + p.projectDetails.budget, 0))}</p>
                 </div>
                 <div className={styles.stat}>
                     <h3>Completed Projects</h3>
-                    <p aria-label="Completed Projects">{data.projects.filter(p => p.projectDetails.status === 'Completed').length}</p>
+                    <p aria-label="Completed Projects">{data.projects.filter((p: Project) => p.projectDetails.status === 'Completed').length}</p>
                 </div>
             </div>
 
