@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import styles from '../styles/MeshStats.module.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import PageHeader from './PageHeader';
 
 interface Downloads {
     last_day: number;
@@ -84,14 +85,16 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) =>
         }))
         : [];
 
+    const versionSubtitle = currentStats?.npm?.latest_version
+        ? `Latest Version: ${currentStats.npm.latest_version}`
+        : undefined;
+
     return (
-        <div className={styles.container} data-testid="mesh-stats-view">
-            <div className={styles.header}>
-                <h1 className={styles.title}>Mesh SDK Statistics</h1>
-                {currentStats?.npm?.latest_version && (
-                    <p className={styles.version}>Latest Version: {currentStats.npm.latest_version}</p>
-                )}
-            </div>
+        <div data-testid="mesh-stats-view">
+            <PageHeader
+                title="Mesh SDK Statistics"
+                subtitle={versionSubtitle}
+            />
 
             {currentStats?.npm?.downloads && (
                 <div className={styles.statsGrid}>

@@ -1,6 +1,7 @@
 import DRepVotingList from '../components/DRepVotingList';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/Voting.module.css';
+import PageHeader from '../components/PageHeader';
 
 interface VoteData {
     proposalId: string;
@@ -53,10 +54,10 @@ export default function DRepVoting() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.pageHeader}>
-                <h1 className={styles.title}>DRep Voting Dashboard</h1>
-                <p className={styles.description}>Track and analyze DRep voting patterns here.</p>
-            </div>
+            <PageHeader
+                title="DRep Voting Dashboard"
+                subtitle="Track and analyze DRep voting patterns here."
+            />
 
             <div className={styles.stats} data-testid="voting-stats">
                 <div className={styles.stat}>

@@ -1,6 +1,7 @@
 import CatalystProposalsList from '../components/CatalystProposalsList';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/Proposals.module.css';
+import PageHeader from '../components/PageHeader';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
@@ -63,10 +64,10 @@ export default function CatalystProposals() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.pageHeader}>
-                <h1 className={styles.title}>Catalyst Proposals</h1>
-                <p className={styles.description}>View and analyze Catalyst proposals here.</p>
-            </div>
+            <PageHeader
+                title="Catalyst Proposals"
+                subtitle="View and analyze Catalyst proposals here."
+            />
 
             <div className={styles.stats} role="region" aria-label="statistics">
                 <div className={styles.stat}>
