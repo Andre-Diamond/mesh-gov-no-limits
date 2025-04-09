@@ -3,8 +3,8 @@ import { useData } from '../contexts/DataContext';
 import styles from '../styles/Proposals.module.css';
 import PageHeader from '../components/PageHeader';
 import SearchFilterBar from '../components/SearchFilterBar';
-import { catalystProposalsFilterConfig, filterProposals } from '../config/filterConfig';
-import { useState } from 'react';
+import { filterProposals, generateCatalystProposalsFilterConfig } from '../config/filterConfig';
+import { useState, useMemo } from 'react';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
@@ -67,6 +67,11 @@ export default function CatalystProposals() {
 
     const data = catalystData.catalystData;
 
+    // Generate dynamic filter config based on available data
+    const dynamicFilterConfig = useMemo(() => {
+        return generateCatalystProposalsFilterConfig(data.projects);
+    }, [data.projects]);
+
     // Handle search and filtering
     const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {
         if (!searchTerm && Object.keys(activeFilters).length === 0) {
@@ -99,7 +104,7 @@ export default function CatalystProposals() {
             />
 
             <SearchFilterBar
-                config={catalystProposalsFilterConfig}
+                config={dynamicFilterConfig}
                 onSearch={handleSearch}
             />
 

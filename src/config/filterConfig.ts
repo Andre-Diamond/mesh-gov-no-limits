@@ -1,6 +1,27 @@
 import { SearchFilterConfig } from '../components/SearchFilterBar';
 
-// Dashboard page - search across all data
+// Helper functions to generate filter options dynamically from data
+export const getUniqueValues = <T, K extends keyof T>(items: T[], key: K): T[K][] => {
+    const values = items.map(item => item[key]);
+    return [...new Set(values)];
+};
+
+export const extractFundingRounds = (projects: any[]): string[] => {
+    const fundingRounds = projects.map(project =>
+        project.projectDetails.category.substring(0, 3)
+    );
+    return [...new Set(fundingRounds)];
+};
+
+export const getProposalTypes = (votes: any[]): string[] => {
+    return [...new Set(votes.map(vote => vote.proposalType))];
+};
+
+export const getPackageNames = (packageData: any[]): string[] => {
+    return [...new Set(packageData.map(pkg => pkg.name))];
+};
+
+// Dashboard page - search across all data (this one is static by nature)
 export const dashboardFilterConfig: SearchFilterConfig = {
     placeholder: 'Search across votes, proposals, and stats...',
     filters: [
@@ -16,88 +37,89 @@ export const dashboardFilterConfig: SearchFilterConfig = {
     ]
 };
 
-// DRep Voting page - search and filter votes
-export const drepVotingFilterConfig: SearchFilterConfig = {
-    placeholder: 'Search votes by title, rationale, or type...',
-    filters: [
-        {
-            id: 'vote',
-            label: 'Vote Decision',
-            options: [
-                { label: 'Yes', value: 'Yes' },
-                { label: 'No', value: 'No' },
-                { label: 'Abstain', value: 'Abstain' }
-            ]
-        },
-        {
-            id: 'proposalType',
-            label: 'Proposal Type',
-            options: [
-                { label: 'Parameter Change', value: 'ParameterChange' },
-                { label: 'Treasury Withdrawal', value: 'TreasuryWithdrawal' },
-                { label: 'InfoAction', value: 'InfoAction' },
-                { label: 'Hard Fork', value: 'HardFork' },
-                { label: 'New Constitution', value: 'NewConstitution' },
-                { label: 'Update Committee', value: 'UpdateCommittee' }
-            ]
-        }
-    ]
+// Dynamic filter configuration generators
+export const generateDrepVotingFilterConfig = (votes: any[]): SearchFilterConfig => {
+    // Get unique proposal types from votes data
+    const proposalTypes = getProposalTypes(votes);
+
+    return {
+        placeholder: 'Search votes by title, rationale, or type...',
+        filters: [
+            {
+                id: 'vote',
+                label: 'Vote Decision',
+                options: [
+                    { label: 'Yes', value: 'Yes' },
+                    { label: 'No', value: 'No' },
+                    { label: 'Abstain', value: 'Abstain' }
+                ]
+            },
+            {
+                id: 'proposalType',
+                label: 'Proposal Type',
+                options: proposalTypes.map(type => ({
+                    label: type,
+                    value: type
+                }))
+            }
+        ]
+    };
 };
 
-// Catalyst Proposals page - search and filter proposals
-export const catalystProposalsFilterConfig: SearchFilterConfig = {
-    placeholder: 'Search proposals by title, category, or status...',
-    filters: [
-        {
-            id: 'status',
-            label: 'Status',
-            options: [
-                { label: 'Completed', value: 'Completed' },
-                { label: 'In Progress', value: 'In Progress' },
-                { label: 'On Hold', value: 'On Hold' }
-            ]
-        },
-        {
-            id: 'category',
-            label: 'Category',
-            options: [
-                { label: 'DApp', value: 'DApp' },
-                { label: 'Developer Ecosystem', value: 'Developer Ecosystem' },
-                { label: 'Governance', value: 'Governance' },
-                { label: 'Identity', value: 'Identity' },
-                { label: 'Infrastructure', value: 'Infrastructure' }
-            ]
-        }
-    ]
+export const generateCatalystProposalsFilterConfig = (projects: any[]): SearchFilterConfig => {
+    // Extract unique statuses and funding rounds from projects data
+    const statuses = [...new Set(projects.map(project => project.projectDetails.status))];
+    const fundingRounds = extractFundingRounds(projects);
+
+    return {
+        placeholder: 'Search proposals by title, funding round, or status...',
+        filters: [
+            {
+                id: 'status',
+                label: 'Status',
+                options: statuses.map(status => ({
+                    label: status,
+                    value: status
+                }))
+            },
+            {
+                id: 'fundingRound',
+                label: 'Funding Round',
+                options: fundingRounds.map(round => ({
+                    label: round,
+                    value: round
+                }))
+            }
+        ]
+    };
 };
 
-// Mesh Stats page - search and filter stats
-export const meshStatsFilterConfig: SearchFilterConfig = {
-    placeholder: 'Search statistics by package name or trend...',
-    filters: [
-        {
-            id: 'package',
-            label: 'Package',
-            options: [
-                { label: 'Core', value: 'Core' },
-                { label: 'React', value: 'React' },
-                { label: 'Transaction', value: 'Transaction' },
-                { label: 'Wallet', value: 'Wallet' },
-                { label: 'Provider', value: 'Provider' },
-                { label: 'Core CSL', value: 'Core CSL' },
-                { label: 'Core CST', value: 'Core CST' }
-            ]
-        },
-        {
-            id: 'trend',
-            label: 'Trend',
-            options: [
-                { label: 'Increasing', value: 'up' },
-                { label: 'Decreasing', value: 'down' },
-                { label: 'Stable', value: 'stable' }
-            ]
-        }
-    ]
+export const generateMeshStatsFilterConfig = (packageData: any[]): SearchFilterConfig => {
+    // Extract unique package names from stats data
+    const packageNames = getPackageNames(packageData);
+
+    return {
+        placeholder: 'Search statistics by package name or trend...',
+        filters: [
+            {
+                id: 'package',
+                label: 'Package',
+                options: packageNames.map(name => ({
+                    label: name,
+                    value: name
+                }))
+            },
+            {
+                id: 'trend',
+                label: 'Trend',
+                options: [
+                    { label: 'Increasing', value: 'up' },
+                    { label: 'Decreasing', value: 'down' },
+                    { label: 'Stable', value: 'stable' }
+                ]
+            }
+        ]
+    };
 };
 
 // Search helper functions for each data type
@@ -130,11 +152,14 @@ export const filterProposals = (projects: any[], searchTerm: string, filters: Re
             project.projectDetails.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             project.projectDetails.category.toLowerCase().includes(searchTerm.toLowerCase());
 
+        // Extract funding round from category (first 3 characters)
+        const fundingRound = project.projectDetails.category.substring(0, 3);
+
         // Apply individual filters
         const statusMatch = !filters.status || project.projectDetails.status === filters.status;
-        const categoryMatch = !filters.category || project.projectDetails.category === filters.category;
+        const fundingRoundMatch = !filters.fundingRound || fundingRound === filters.fundingRound;
 
-        return searchMatch && statusMatch && categoryMatch;
+        return searchMatch && statusMatch && fundingRoundMatch;
     });
 };
 

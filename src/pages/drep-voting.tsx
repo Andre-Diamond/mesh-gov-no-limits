@@ -3,8 +3,8 @@ import { useData } from '../contexts/DataContext';
 import styles from '../styles/Voting.module.css';
 import PageHeader from '../components/PageHeader';
 import SearchFilterBar from '../components/SearchFilterBar';
-import { drepVotingFilterConfig, filterVotes } from '../config/filterConfig';
-import { useState } from 'react';
+import { filterVotes, generateDrepVotingFilterConfig } from '../config/filterConfig';
+import { useState, useMemo } from 'react';
 
 interface VoteData {
     proposalId: string;
@@ -58,6 +58,11 @@ export default function DRepVoting() {
         return acc;
     }, {} as Record<string, number>);
 
+    // Generate dynamic filter config based on available votes data
+    const dynamicFilterConfig = useMemo(() => {
+        return generateDrepVotingFilterConfig(votes);
+    }, [votes]);
+
     // Handle search and filter
     const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {
         if (!searchTerm && Object.keys(activeFilters).length === 0) {
@@ -82,7 +87,7 @@ export default function DRepVoting() {
             />
 
             <SearchFilterBar
-                config={drepVotingFilterConfig}
+                config={dynamicFilterConfig}
                 onSearch={handleSearch}
             />
 

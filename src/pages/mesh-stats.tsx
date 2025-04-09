@@ -2,8 +2,8 @@ import MeshStatsView, { FilteredStats } from '../components/MeshStatsView';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/MeshStats.module.css';
 import SearchFilterBar from '../components/SearchFilterBar';
-import { meshStatsFilterConfig } from '../config/filterConfig';
-import { useState } from 'react';
+import { generateMeshStatsFilterConfig } from '../config/filterConfig';
+import { useState, useMemo } from 'react';
 import PageHeader from '../components/PageHeader';
 
 export default function MeshStatsPage() {
@@ -46,6 +46,24 @@ export default function MeshStatsPage() {
         ? `Latest Version: ${meshData.currentStats.npm.latest_version}`
         : undefined;
 
+    // Create package data array for the filter generator
+    const packageData = useMemo(() => {
+        return meshData?.currentStats?.npm ? [
+            { name: 'Core', downloads: meshData.currentStats.npm.downloads.last_month },
+            { name: 'React', downloads: meshData.currentStats.npm.react_package_downloads },
+            { name: 'Transaction', downloads: meshData.currentStats.npm.transaction_package_downloads },
+            { name: 'Wallet', downloads: meshData.currentStats.npm.wallet_package_downloads },
+            { name: 'Provider', downloads: meshData.currentStats.npm.provider_package_downloads },
+            { name: 'Core CSL', downloads: meshData.currentStats.npm.core_csl_package_downloads },
+            { name: 'Core CST', downloads: meshData.currentStats.npm.core_cst_package_downloads },
+        ] : [];
+    }, [meshData]);
+
+    // Generate dynamic filter config
+    const dynamicFilterConfig = useMemo(() => {
+        return generateMeshStatsFilterConfig(packageData);
+    }, [packageData]);
+
     // Handle search and filtering
     const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {
         if (!searchTerm && Object.keys(activeFilters).length === 0) {
@@ -55,17 +73,6 @@ export default function MeshStatsPage() {
         }
 
         setIsSearching(true);
-
-        // Create package data array for filtering
-        const packageData = meshData.currentStats?.npm ? [
-            { name: 'Core', downloads: meshData.currentStats.npm.downloads.last_month },
-            { name: 'React', downloads: meshData.currentStats.npm.react_package_downloads },
-            { name: 'Transaction', downloads: meshData.currentStats.npm.transaction_package_downloads },
-            { name: 'Wallet', downloads: meshData.currentStats.npm.wallet_package_downloads },
-            { name: 'Provider', downloads: meshData.currentStats.npm.provider_package_downloads },
-            { name: 'Core CSL', downloads: meshData.currentStats.npm.core_csl_package_downloads },
-            { name: 'Core CST', downloads: meshData.currentStats.npm.core_cst_package_downloads },
-        ] : [];
 
         // Filter package data based on search term and filter
         const filteredPackages = packageData.filter(pkg => {
@@ -112,7 +119,7 @@ export default function MeshStatsPage() {
             />
 
             <SearchFilterBar
-                config={meshStatsFilterConfig}
+                config={dynamicFilterConfig}
                 onSearch={handleSearch}
             />
 
