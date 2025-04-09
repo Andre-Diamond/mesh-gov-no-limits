@@ -2,6 +2,9 @@ import DRepVotingList from '../components/DRepVotingList';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/Voting.module.css';
 import PageHeader from '../components/PageHeader';
+import SearchFilterBar from '../components/SearchFilterBar';
+import { drepVotingFilterConfig, filterVotes } from '../config/filterConfig';
+import { useState } from 'react';
 
 interface VoteData {
     proposalId: string;
@@ -21,6 +24,8 @@ interface VoteData {
 
 export default function DRepVoting() {
     const { meshData, isLoading, error } = useData();
+    const [filteredVotes, setFilteredVotes] = useState<VoteData[]>([]);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
     if (isLoading) {
         return (
@@ -40,6 +45,7 @@ export default function DRepVoting() {
 
     const votes = meshData?.votes || [];
 
+    // Stats calculated from the complete dataset
     const voteStats = {
         total: votes.length,
         yes: votes.filter(v => v.vote === 'Yes').length,
@@ -52,11 +58,32 @@ export default function DRepVoting() {
         return acc;
     }, {} as Record<string, number>);
 
+    // Handle search and filter
+    const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {
+        if (!searchTerm && Object.keys(activeFilters).length === 0) {
+            setFilteredVotes([]);
+            setIsSearching(false);
+            return;
+        }
+
+        setIsSearching(true);
+        const filtered = filterVotes(votes, searchTerm, activeFilters);
+        setFilteredVotes(filtered);
+    };
+
+    // Decide which votes to display
+    const displayVotes = isSearching ? filteredVotes : votes;
+
     return (
         <div className={styles.container}>
             <PageHeader
                 title={<>DRep Voting <span>Dashboard</span></>}
                 subtitle="Track and analyze DRep voting patterns here."
+            />
+
+            <SearchFilterBar
+                config={drepVotingFilterConfig}
+                onSearch={handleSearch}
             />
 
             <div className={styles.stats} data-testid="voting-stats">
@@ -78,19 +105,27 @@ export default function DRepVoting() {
                 </div>
             </div>
 
-            <div className={styles.typeStats}>
-                <h2>Proposal Types</h2>
-                <div className={styles.typeGrid}>
-                    {(Object.entries(typeStats) as Array<[string, number]>).map(([type, count]) => (
-                        <div key={type} className={styles.typeStat}>
-                            <h4>{type}</h4>
-                            <p>{count}</p>
-                        </div>
-                    ))}
+            {!isSearching && (
+                <div className={styles.typeStats}>
+                    <h2>Proposal Types</h2>
+                    <div className={styles.typeGrid}>
+                        {(Object.entries(typeStats) as Array<[string, number]>).map(([type, count]) => (
+                            <div key={type} className={styles.typeStat}>
+                                <h4>{type}</h4>
+                                <p>{count}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            <DRepVotingList votes={votes} />
+            {isSearching && (
+                <div className={styles.searchResults}>
+                    <h2>Search Results ({filteredVotes.length} votes found)</h2>
+                </div>
+            )}
+
+            <DRepVotingList votes={displayVotes} />
         </div>
     );
 } 
