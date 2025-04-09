@@ -76,14 +76,11 @@
 }
 
 .metricExtra {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-top: 0.25rem;
-    border-top: 1px solid var(--border-color);
-    opacity: 0.8;
+    margin-top: 0.5rem;
+    text-align: center;
+    line-height: 1.5;
 }
 
 .yearlyTable {
@@ -127,4 +124,41 @@
     .metricsContainer {
         display: none;
     }
+}
+
+.chartsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0.5rem 0;
+    gap: 0.5rem;
+}
+
+.chartWrapper {
+    width: 100%;
+    max-width: 160px;
+    text-align: center;
+}
+
+.chartWrapper:first-child {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.chartWrapper:last-child {
+    padding-top: 0.75rem;
+}
+
+.chartWrapper h4 {
+    margin: 0 0 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.chartSubtext {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    text-align: center;
 }
