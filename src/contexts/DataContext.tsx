@@ -1,21 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import fetchData from '../lib/fetchData';
-
-interface MeshData {
-    currentStats: any;
-    yearlyStats: Record<number, any>;
-    votes: any[];
-    lastFetched: number;
-}
-
-interface CatalystData {
-    catalystData: any;
-    lastFetched: number;
-}
+import { MeshData, CatalystContextData } from '../types';
 
 interface DataContextType {
     meshData: MeshData | null;
-    catalystData: CatalystData | null;
+    catalystData: CatalystContextData | null;
     isLoading: boolean;
     error: string | null;
     refetchData: () => Promise<void>;
@@ -66,7 +55,7 @@ const safeSetItem = (key: string, value: string): void => {
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
     const [meshData, setMeshData] = useState<MeshData | null>(null);
-    const [catalystData, setCatalystData] = useState<CatalystData | null>(null);
+    const [catalystData, setCatalystData] = useState<CatalystContextData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -162,7 +151,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const fetchCatalystData = async () => {
         try {
             const data = await fetchData('https://raw.githubusercontent.com/Signius/mesh-automations/main/mesh-gov-updates/catalyst-proposals/catalyst-data.json');
-            const newData: CatalystData = {
+            const newData: CatalystContextData = {
                 catalystData: data,
                 lastFetched: Date.now()
             };

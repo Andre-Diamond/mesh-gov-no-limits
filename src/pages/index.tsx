@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import PageHeader from '../components/PageHeader';
 import StatusCard, { StatusIconType } from '../components/StatusCard';
 import SearchFilterBar from '../components/SearchFilterBar';
-import SearchResultCard, { SearchResult } from '../components/SearchResultCard';
 import { dashboardFilterConfig } from '../config/filterConfig';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -237,7 +236,8 @@ const VotingTableCard = ({ votes }: { votes: VoteData[] }) => {
 export default function Home() {
     const { meshData, catalystData, isLoading, error, refetchData } = useData();
     const router = useRouter();
-    const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+    const [filteredVotes, setFilteredVotes] = useState(meshData?.votes || []);
+    const [filteredProjects, setFilteredProjects] = useState(catalystData?.catalystData?.projects || []);
     const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
 
     if (isLoading) {
@@ -294,104 +294,40 @@ export default function Home() {
 
     // Search functionality
     const handleSearch = (searchTerm: string, filters: Record<string, string>) => {
-        // Clear search results if empty search
+        // Clear filters if empty search
         if (!searchTerm && Object.keys(filters).length === 0) {
-            setSearchResults([]);
+            setFilteredVotes(meshData?.votes || []);
+            setFilteredProjects(catalystData?.catalystData?.projects || []);
             setIsSearchActive(false);
             return;
         }
 
         setIsSearchActive(true);
-        const results: SearchResult[] = [];
-
-        // Filter by type if specified
         const searchType = filters.type || '';
 
-        // Search votes
+        // Filter votes
         if (!searchType || searchType === 'vote') {
             const matchingVotes = meshData?.votes?.filter(vote => {
                 return vote.proposalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     vote.proposalType.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     vote.rationale.toLowerCase().includes(searchTerm.toLowerCase());
             }) || [];
-
-            // Add top 5 matching votes
-            matchingVotes.slice(0, 5).forEach(vote => {
-                let iconType: 'green' | 'red' | 'yellow' | 'blue' = 'blue';
-                if (vote.vote === 'Yes') iconType = 'green';
-                else if (vote.vote === 'No') iconType = 'red';
-                else if (vote.vote === 'Abstain') iconType = 'yellow';
-
-                results.push({
-                    id: vote.proposalId,
-                    title: vote.proposalTitle,
-                    subtitle: `${formatDate(vote.blockTime)} • ${vote.proposalType}`,
-                    type: 'vote',
-                    value: vote.vote,
-                    iconType
-                });
-            });
+            setFilteredVotes(matchingVotes);
+        } else {
+            setFilteredVotes([]);
         }
 
-        // Search catalyst proposals
+        // Filter catalyst proposals
         if (!searchType || searchType === 'proposal') {
             const matchingProjects = catalystData?.catalystData?.projects?.filter((project: Project) => {
                 return project.projectDetails.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     project.projectDetails.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     project.projectDetails.status.toLowerCase().includes(searchTerm.toLowerCase());
             }) || [];
-
-            // Add top 5 matching projects
-            matchingProjects.slice(0, 5).forEach((project: Project) => {
-                let iconType: 'green' | 'red' | 'yellow' | 'blue' = 'blue';
-                if (project.projectDetails.status === 'Completed') iconType = 'green';
-                else if (project.projectDetails.status === 'In Progress') iconType = 'blue';
-                else iconType = 'yellow';
-
-                const completion = project.projectDetails.milestones_qty === 0 ? 0 :
-                    Math.round((project.milestonesCompleted / project.projectDetails.milestones_qty) * 100);
-
-                results.push({
-                    id: project.projectDetails.project_id.toString(),
-                    title: project.projectDetails.title,
-                    subtitle: `${project.projectDetails.category} • ${formatNumber(project.projectDetails.budget)} ADA`,
-                    type: 'proposal',
-                    value: `${completion}%`,
-                    iconType
-                });
-            });
+            setFilteredProjects(matchingProjects);
+        } else {
+            setFilteredProjects([]);
         }
-
-        // Search mesh stats
-        if (!searchType || searchType === 'stat') {
-            const packageData = meshData?.currentStats?.npm ? [
-                { name: 'Core', downloads: meshData.currentStats.npm.downloads.last_month },
-                { name: 'React', downloads: meshData.currentStats.npm.react_package_downloads },
-                { name: 'Transaction', downloads: meshData.currentStats.npm.transaction_package_downloads },
-                { name: 'Wallet', downloads: meshData.currentStats.npm.wallet_package_downloads },
-                { name: 'Provider', downloads: meshData.currentStats.npm.provider_package_downloads },
-                { name: 'Core CSL', downloads: meshData.currentStats.npm.core_csl_package_downloads },
-                { name: 'Core CST', downloads: meshData.currentStats.npm.core_cst_package_downloads },
-            ] : [];
-
-            const matchingPackages = packageData.filter(pkg =>
-                pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-
-            // Add matching packages
-            matchingPackages.forEach(pkg => {
-                results.push({
-                    id: pkg.name,
-                    title: `${pkg.name} Package`,
-                    subtitle: 'Last Month Downloads',
-                    type: 'stat',
-                    value: formatNumber(pkg.downloads),
-                    iconType: 'blue'
-                });
-            });
-        }
-
-        setSearchResults(results);
     };
 
     return (
@@ -406,69 +342,52 @@ export default function Home() {
                 onSearch={handleSearch}
             />
 
-            {/* Search Results */}
-            {isSearchActive && (
-                <div className={styles.searchResults}>
-                    <h2>Search Results</h2>
-                    {searchResults.length === 0 ? (
-                        <div className={styles.empty}>No results found. Try a different search term or filter.</div>
-                    ) : (
-                        <div className={styles.searchResultsGrid}>
-                            {searchResults.map((result) => (
-                                <SearchResultCard key={`${result.type}-${result.id}`} result={result} />
-                            ))}
-                        </div>
-                    )}
+            {/* Top metrics */}
+            <div className={styles.statusList}>
+                <h2>Key Metrics</h2>
+
+                {/* Voting Card */}
+                <StatusCard
+                    title="Total Votes"
+                    value={totalVotes}
+                    iconType="green"
+                    subtitle={`Latest vote: ${allVotes[0] ? formatDate(allVotes[0].blockTime) : 'N/A'}`}
+                    href="/drep-voting"
+                />
+
+                {/* Proposals Card */}
+                <StatusCard
+                    title="Catalyst Proposals"
+                    value={totalProposals}
+                    iconType="blue"
+                    subtitle={`${completedProposals} completed (${Math.round((completedProposals / totalProposals) * 100)}%)`}
+                    href="/catalyst-proposals"
+                />
+
+                {/* SDK Downloads Card */}
+                <StatusCard
+                    title="SDK Downloads"
+                    value={downloads ? formatNumber(downloads.last_month) : 'N/A'}
+                    iconType="yellow"
+                    subtitle={`This month • ${githubUsage} projects using Mesh`}
+                    href="/mesh-stats"
+                />
+            </div>
+
+            {/* Voting Table Card */}
+            {filteredVotes.length > 0 && (
+                <div className={styles.statusList}>
+                    <h2>Voting Activity</h2>
+                    <VotingTableCard votes={filteredVotes} />
                 </div>
             )}
 
-            {/* Only show the dashboard contents when not searching */}
-            {!isSearchActive && (
-                <>
-                    {/* Top metrics */}
-                    <div className={styles.statusList}>
-                        <h2>Key Metrics</h2>
-
-                        {/* Voting Card */}
-                        <StatusCard
-                            title="Total Votes"
-                            value={totalVotes}
-                            iconType="green"
-                            subtitle={`Latest vote: ${allVotes[0] ? formatDate(allVotes[0].blockTime) : 'N/A'}`}
-                            href="/drep-voting"
-                        />
-
-                        {/* Proposals Card */}
-                        <StatusCard
-                            title="Catalyst Proposals"
-                            value={totalProposals}
-                            iconType="blue"
-                            subtitle={`${completedProposals} completed (${Math.round((completedProposals / totalProposals) * 100)}%)`}
-                            href="/catalyst-proposals"
-                        />
-
-                        {/* SDK Downloads Card */}
-                        <StatusCard
-                            title="SDK Downloads"
-                            value={downloads ? formatNumber(downloads.last_month) : 'N/A'}
-                            iconType="yellow"
-                            subtitle={`This month • ${githubUsage} projects using Mesh`}
-                            href="/mesh-stats"
-                        />
-                    </div>
-
-                    {/* Voting Table Card */}
-                    <div className={styles.statusList}>
-                        <h2>Voting Activity</h2>
-                        <VotingTableCard votes={allVotes} />
-                    </div>
-
-                    {/* Catalyst Proposals Overview Card */}
-                    <div className={styles.statusList}>
-                        <h2>Catalyst Proposals Overview</h2>
-                        <CatalystProposalsCard projects={allProjects} />
-                    </div>
-                </>
+            {/* Catalyst Proposals Overview Card */}
+            {filteredProjects.length > 0 && (
+                <div className={styles.statusList}>
+                    <h2>Catalyst Proposals Overview</h2>
+                    <CatalystProposalsCard projects={filteredProjects} />
+                </div>
             )}
         </div>
     );

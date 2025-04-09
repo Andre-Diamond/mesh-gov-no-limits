@@ -1,7 +1,7 @@
 import MeshStatsView, { FilteredStats } from '../components/MeshStatsView';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/MeshStats.module.css';
-import SearchFilterBar from '../components/SearchFilterBar';
+import SearchFilterBar, { SearchFilterConfig } from '../components/SearchFilterBar';
 import { generateMeshStatsFilterConfig } from '../config/filterConfig';
 import { useState, useMemo } from 'react';
 import PageHeader from '../components/PageHeader';
@@ -10,6 +10,32 @@ export default function MeshStatsPage() {
     const { meshData, isLoading, error } = useData();
     const [filteredStats, setFilteredStats] = useState<FilteredStats>({});
     const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    // Create package data array for the filter generator
+    const packageData = useMemo(() => {
+        if (!meshData?.currentStats?.npm) return [];
+        return [
+            { name: 'Core', downloads: meshData.currentStats.npm.downloads.last_month },
+            { name: 'React', downloads: meshData.currentStats.npm.react_package_downloads },
+            { name: 'Transaction', downloads: meshData.currentStats.npm.transaction_package_downloads },
+            { name: 'Wallet', downloads: meshData.currentStats.npm.wallet_package_downloads },
+            { name: 'Provider', downloads: meshData.currentStats.npm.provider_package_downloads },
+            { name: 'Core CSL', downloads: meshData.currentStats.npm.core_csl_package_downloads },
+            { name: 'Core CST', downloads: meshData.currentStats.npm.core_cst_package_downloads },
+        ];
+    }, [meshData]);
+
+    // Generate dynamic filter config
+    const dynamicFilterConfig = useMemo(() => {
+        return generateMeshStatsFilterConfig(packageData);
+    }, [packageData]);
+
+    // Version subtitle for PageHeader
+    const versionSubtitle = useMemo(() => {
+        return meshData?.currentStats?.npm?.latest_version
+            ? `Latest Version: ${meshData.currentStats.npm.latest_version}`
+            : undefined;
+    }, [meshData]);
 
     if (isLoading) {
         return (
@@ -40,29 +66,6 @@ export default function MeshStatsPage() {
             </div>
         );
     }
-
-    // Version subtitle for PageHeader
-    const versionSubtitle = meshData.currentStats?.npm?.latest_version
-        ? `Latest Version: ${meshData.currentStats.npm.latest_version}`
-        : undefined;
-
-    // Create package data array for the filter generator
-    const packageData = useMemo(() => {
-        return meshData?.currentStats?.npm ? [
-            { name: 'Core', downloads: meshData.currentStats.npm.downloads.last_month },
-            { name: 'React', downloads: meshData.currentStats.npm.react_package_downloads },
-            { name: 'Transaction', downloads: meshData.currentStats.npm.transaction_package_downloads },
-            { name: 'Wallet', downloads: meshData.currentStats.npm.wallet_package_downloads },
-            { name: 'Provider', downloads: meshData.currentStats.npm.provider_package_downloads },
-            { name: 'Core CSL', downloads: meshData.currentStats.npm.core_csl_package_downloads },
-            { name: 'Core CST', downloads: meshData.currentStats.npm.core_cst_package_downloads },
-        ] : [];
-    }, [meshData]);
-
-    // Generate dynamic filter config
-    const dynamicFilterConfig = useMemo(() => {
-        return generateMeshStatsFilterConfig(packageData);
-    }, [packageData]);
 
     // Handle search and filtering
     const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {

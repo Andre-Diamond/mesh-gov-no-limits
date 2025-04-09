@@ -2,7 +2,7 @@ import DRepVotingList from '../components/DRepVotingList';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/Voting.module.css';
 import PageHeader from '../components/PageHeader';
-import SearchFilterBar from '../components/SearchFilterBar';
+import SearchFilterBar, { SearchFilterConfig } from '../components/SearchFilterBar';
 import { filterVotes, generateDrepVotingFilterConfig } from '../config/filterConfig';
 import { useState, useMemo } from 'react';
 
@@ -26,6 +26,15 @@ export default function DRepVoting() {
     const { meshData, isLoading, error } = useData();
     const [filteredVotes, setFilteredVotes] = useState<VoteData[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    // Generate dynamic filter config based on available votes data
+    const dynamicFilterConfig = useMemo(() => {
+        if (!meshData?.votes) return {
+            placeholder: "Search votes...",
+            filters: [],
+        } as SearchFilterConfig;
+        return generateDrepVotingFilterConfig(meshData.votes);
+    }, [meshData]);
 
     if (isLoading) {
         return (
@@ -57,11 +66,6 @@ export default function DRepVoting() {
         acc[vote.proposalType] = (acc[vote.proposalType] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
-
-    // Generate dynamic filter config based on available votes data
-    const dynamicFilterConfig = useMemo(() => {
-        return generateDrepVotingFilterConfig(votes);
-    }, [votes]);
 
     // Handle search and filter
     const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {

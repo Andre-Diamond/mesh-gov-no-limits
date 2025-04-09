@@ -1,56 +1,12 @@
 import { FC } from 'react';
 import styles from '../styles/MeshStats.module.css';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-interface Downloads {
-    last_day: number;
-    last_week: number;
-    last_month: number;
-    last_year: number;
-}
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { YearlyStats, CurrentStats } from '../types';
 
 interface MonthlyDownload {
     month: string;
     downloads: number;
     trend: string;
-}
-
-interface YearlyTotals {
-    core: number;
-    react: number;
-    transaction: number;
-    wallet: number;
-    provider: number;
-    coreCsl: number;
-    coreCst: number;
-}
-
-interface MeshStats {
-    github: {
-        core_in_package_json: number;
-        core_in_any_file: number;
-    };
-    npm: {
-        downloads: Downloads;
-        react_package_downloads: number;
-        transaction_package_downloads: number;
-        wallet_package_downloads: number;
-        provider_package_downloads: number;
-        core_csl_package_downloads: number;
-        core_cst_package_downloads: number;
-        latest_version: string;
-        dependents_count: number;
-    };
-}
-
-interface YearlyStats {
-    year: number;
-    yearlyTotals: YearlyTotals;
-    monthlyDownloads: MonthlyDownload[];
-    peakMonth: {
-        name: string;
-        downloads: number;
-    };
 }
 
 export interface FilteredStats {
@@ -61,7 +17,7 @@ export interface FilteredStats {
 }
 
 interface MeshStatsViewProps {
-    currentStats: MeshStats;
+    currentStats: CurrentStats;
     yearlyStats: Record<number, YearlyStats>;
     filteredStats?: FilteredStats;
 }
