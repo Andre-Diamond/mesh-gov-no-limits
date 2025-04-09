@@ -5,10 +5,11 @@ import PageHeader from '../components/PageHeader';
 import SearchFilterBar from '../components/SearchFilterBar';
 import { filterProposals, generateCatalystProposalsFilterConfig } from '../config/filterConfig';
 import { useState, useMemo } from 'react';
+import { CatalystData, CatalystProject } from '../types';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return new Intl.NumberFormat('en-US').format(num);
 };
 
 // Format ADA amount with symbol
@@ -16,29 +17,9 @@ const formatAda = (amount: number): string => {
     return `₳${formatNumber(amount)}`;
 };
 
-interface Project {
-    projectDetails: {
-        id: number;
-        title: string;
-        budget: number;
-        milestones_qty: number;
-        funds_distributed: number;
-        project_id: number;
-        category: string;
-        status: string;
-        finished: string;
-    };
-    milestonesCompleted: number;
-}
-
-interface CatalystData {
-    timestamp: string;
-    projects: Project[];
-}
-
 export default function CatalystProposals() {
     const { catalystData, isLoading, error } = useData();
-    const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+    const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
 
     if (isLoading) {
@@ -87,8 +68,8 @@ export default function CatalystProposals() {
 
     // Calculate stats based on all projects, not just filtered ones
     const allProjects = data.projects;
-    const totalBudget = allProjects.reduce((sum: number, p: Project) => sum + p.projectDetails.budget, 0);
-    const completedProjects = allProjects.filter((p: Project) => p.projectDetails.status === 'Completed').length;
+    const totalBudget = allProjects.reduce((sum: number, p: CatalystProject) => sum + p.projectDetails.budget, 0);
+    const completedProjects = allProjects.filter((p: CatalystProject) => p.projectDetails.status === 'Completed').length;
 
     // Determine which data to display
     const displayData = {

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import styles from '../styles/Proposals.module.css';
+import { CatalystData, CatalystProject } from '../types';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
@@ -50,11 +51,6 @@ interface ProjectDetails {
 interface Project {
     projectDetails: ProjectDetails;
     milestonesCompleted: number;
-}
-
-interface CatalystData {
-    timestamp: string;
-    projects: Project[];
 }
 
 interface CatalystProposalsListProps {
