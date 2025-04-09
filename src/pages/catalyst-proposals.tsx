@@ -2,7 +2,7 @@ import CatalystProposalsList from '../components/CatalystProposalsList';
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/Proposals.module.css';
 import PageHeader from '../components/PageHeader';
-import SearchFilterBar from '../components/SearchFilterBar';
+import SearchFilterBar, { SearchFilterConfig } from '../components/SearchFilterBar';
 import { filterProposals, generateCatalystProposalsFilterConfig } from '../config/filterConfig';
 import { useState, useMemo } from 'react';
 import { CatalystData, CatalystProject } from '../types';
@@ -21,6 +21,15 @@ export default function CatalystProposals() {
     const { catalystData, isLoading, error } = useData();
     const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    // Generate dynamic filter config based on available data
+    const dynamicFilterConfig = useMemo(() => {
+        if (!catalystData?.catalystData) return {
+            placeholder: "Search proposals...",
+            filters: [],
+        } as SearchFilterConfig;
+        return generateCatalystProposalsFilterConfig(catalystData.catalystData.projects);
+    }, [catalystData]);
 
     if (isLoading) {
         return (
@@ -47,11 +56,6 @@ export default function CatalystProposals() {
     }
 
     const data = catalystData.catalystData;
-
-    // Generate dynamic filter config based on available data
-    const dynamicFilterConfig = useMemo(() => {
-        return generateCatalystProposalsFilterConfig(data.projects);
-    }, [data.projects]);
 
     // Handle search and filtering
     const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {

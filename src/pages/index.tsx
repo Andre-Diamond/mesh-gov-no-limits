@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import PageHeader from '../components/PageHeader';
 import StatusCard, { StatusIconType } from '../components/StatusCard';
 import SearchFilterBar from '../components/SearchFilterBar';
-import SearchResultCard, { SearchResult } from '../components/SearchResultCard';
 import { dashboardFilterConfig } from '../config/filterConfig';
 import { useState } from 'react';
 import Link from 'next/link';

@@ -72,7 +72,7 @@ const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data }) => {
     };
 
     return (
-        <div className={styles.container} data-testid="proposals-list">
+        <>
             <ul className={styles.list}>
                 {data.projects.map((project) => {
                     // Calculate progress safely
@@ -160,7 +160,7 @@ const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data }) => {
             <div className={styles.timestamp}>
                 Last updated: {formatDate(data.timestamp)}
             </div>
-        </div>
+        </>
     );
 };
 

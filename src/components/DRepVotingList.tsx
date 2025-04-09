@@ -39,7 +39,7 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes }) => {
     }
 
     return (
-        <div className={styles.container} data-testid="voting-list">
+        <div className={styles.listContainer}>
             <ul className={styles.list}>
                 {votes.map((vote) => (
                     <li key={vote.proposalId} className={styles.item} data-testid="vote-item">
