@@ -143,11 +143,11 @@
 
 .chartWrapper:first-child {
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.25rem;
 }
 
 .chartWrapper:last-child {
-    padding-top: 0.75rem;
+    padding-top: 0.25rem;
 }
 
 .chartWrapper h4 {
