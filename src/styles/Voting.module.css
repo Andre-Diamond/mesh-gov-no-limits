@@ -126,8 +126,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 
@@ -174,17 +174,14 @@
 }
 
 .yes {
-    background-color: rgba(16, 185, 129, 0.2);
     color: var(--status-green);
 }
 
 .no {
-    background-color: rgba(239, 68, 68, 0.2);
     color: var(--status-red);
 }
 
 .abstain {
-    background-color: rgba(107, 114, 128, 0.2);
     color: var(--status-gray);
 }
 
@@ -240,10 +237,6 @@
 }
 
 @media (max-width: 768px) {
-    .list {
-        grid-template-columns: 1fr;
-    }
-
     .meta {
         grid-template-columns: 1fr 1fr;
     }
@@ -296,4 +289,17 @@
     .container {
         padding: 1rem;
     }
+}
+
+.searchResults {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.searchResults h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
 }

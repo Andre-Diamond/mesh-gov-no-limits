@@ -21,6 +21,15 @@
             transparent 35%);
 }
 
+.sidebarContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1000;
+}
+
 .main {
     flex-grow: 1;
     padding: 1.5rem 1.5rem 1.5rem calc(250px + 1.5rem);
@@ -36,6 +45,11 @@
 
 /* Media query for mobile */
 @media (max-width: 767px) {
+    .sidebarContainer {
+        width: 100%;
+        height: auto;
+    }
+
     .main {
         padding: 7.5rem 1.5rem 1.5rem 1.5rem;
         /* Extra space at top for the navigation and headings */

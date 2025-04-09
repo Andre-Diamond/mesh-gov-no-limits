@@ -462,6 +462,27 @@
         min-width: calc(50% - 1rem);
         max-width: calc(50% - 1rem);
     }
+
+    .catalystProposalsCard {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .proposalsTable {
+        font-size: 0.8rem;
+    }
+
+    /* For catalyst proposals table - hide fund column */
+    .proposalsTable:not(.votingTable) th:nth-child(2),
+    .proposalsTable:not(.votingTable) td:nth-child(2) {
+        display: none;
+    }
+
+    /* For voting table - hide type column */
+    .votingTable th:nth-child(2),
+    .votingTable td:nth-child(2) {
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {
@@ -481,6 +502,18 @@
         padding: 1.5rem;
         min-height: 150px;
     }
+
+    /* For catalyst proposals table - hide funding column */
+    .proposalsTable:not(.votingTable) th:nth-child(4),
+    .proposalsTable:not(.votingTable) td:nth-child(4) {
+        display: none;
+    }
+
+    /* For voting table - hide epochs column */
+    .votingTable th:nth-child(5),
+    .votingTable td:nth-child(5) {
+        display: none;
+    }
 }
 
 @media (max-width: 640px) {
@@ -497,6 +530,28 @@
     .statusItem {
         min-width: 100%;
         max-width: 100%;
+    }
+
+    .proposalsTable {
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* For catalyst proposals table - hide completion column */
+    .proposalsTable:not(.votingTable) th:nth-child(5),
+    .proposalsTable:not(.votingTable) td:nth-child(5) {
+        display: none;
+    }
+
+    /* For voting table - hide date column */
+    .votingTable th:nth-child(4),
+    .votingTable td:nth-child(4) {
+        display: none;
+    }
+
+    /* Improve title display for both tables */
+    .proposalTitle {
+        max-width: 200px;
     }
 }
 
@@ -528,4 +583,199 @@
 .clickableCard:hover::after {
     opacity: 0.7;
     right: 8px;
+}
+
+.searchResults {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.searchResults h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.searchResultsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.empty {
+    background-color: var(--sidebar-bg);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.statusType {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* Catalyst Proposals Card Styles */
+.catalystProposalsCard {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 400px;
+}
+
+.proposalsTable {
+    margin: 0.5rem 0;
+    width: 100%;
+    overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.proposalsTable table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.proposalsTable thead {
+    position: sticky;
+    top: 0;
+    background-color: var(--sidebar-bg);
+    z-index: 10;
+}
+
+.proposalsTable th {
+    text-align: left;
+    padding: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.proposalsTable td {
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(var(--border-color-rgb, 229, 231, 235), 0.3);
+    color: var(--text-color);
+}
+
+.proposalsTable tr:last-child td {
+    border-bottom: none;
+}
+
+.proposalsTable tr:hover td {
+    background-color: rgba(var(--item-hover-rgb, 243, 244, 246), 0.2);
+}
+
+.proposalsTable tr:nth-child(even) {
+    background-color: rgba(var(--border-color-rgb, 229, 231, 235), 0.1);
+}
+
+.clickableRow {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickableRow:hover td {
+    background-color: rgba(var(--item-hover-rgb, 243, 244, 246), 0.3);
+}
+
+.proposalTitle {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statusWithIcon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.statusWithIcon .statusIcon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0;
+}
+
+.completionWrapper {
+    position: relative;
+    height: 18px;
+    background-color: rgba(var(--border-color-rgb, 229, 231, 235), 0.2);
+    border-radius: 9px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.completionBar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--status-blue), var(--status-green));
+    border-radius: 9px;
+    z-index: 1;
+}
+
+.completionWrapper span {
+    position: relative;
+    z-index: 2;
+    font-size: 0.75rem;
+    font-weight: 500;
+    mix-blend-mode: difference;
+    color: white;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+/* Voting specific styles */
+.votingTable .statusWithIcon {
+    display: inline-flex;
+    padding: 0.2rem 0;
+    border-radius: 0;
+    font-weight: 500;
+    font-size: 0.8rem;
+    background: transparent;
+}
+
+.votingTable tr td:nth-child(3) .statusWithIcon {
+    min-width: 70px;
+    justify-content: flex-start;
+}
+
+.votingTable tr td:nth-child(3) .statusWithIcon div.statusIconGreen+span {
+    color: var(--status-green);
+}
+
+.votingTable tr td:nth-child(3) .statusWithIcon div.statusIconRed+span {
+    color: var(--status-red);
+}
+
+.votingTable tr td:nth-child(3) .statusWithIcon div.statusIconYellow+span {
+    color: var(--status-yellow);
 }

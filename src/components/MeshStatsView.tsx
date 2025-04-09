@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import styles from '../styles/MeshStats.module.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import PageHeader from './PageHeader';
 
 interface Downloads {
     last_day: number;
@@ -54,49 +53,64 @@ interface YearlyStats {
     };
 }
 
+export interface FilteredStats {
+    packageData?: { name: string; downloads: number }[];
+    monthlyData?: { name: string; downloads: number; trend: string }[];
+    currentStats?: any;
+    yearlyStats?: Record<number, any>;
+}
+
 interface MeshStatsViewProps {
     currentStats: MeshStats;
     yearlyStats: Record<number, YearlyStats>;
+    filteredStats?: FilteredStats;
 }
 
 const formatNumber = (num: number): string => {
     return new Intl.NumberFormat('en-US').format(num);
 };
 
-const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) => {
-    const packageData = currentStats?.npm ? [
-        { name: 'Core', downloads: currentStats.npm.downloads.last_month },
-        { name: 'React', downloads: currentStats.npm.react_package_downloads },
-        { name: 'Transaction', downloads: currentStats.npm.transaction_package_downloads },
-        { name: 'Wallet', downloads: currentStats.npm.wallet_package_downloads },
-        { name: 'Provider', downloads: currentStats.npm.provider_package_downloads },
-        { name: 'Core CSL', downloads: currentStats.npm.core_csl_package_downloads },
-        { name: 'Core CST', downloads: currentStats.npm.core_cst_package_downloads },
-    ] : [];
+const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats, filteredStats }) => {
+    // Determine if we're showing filtered data or all data
+    const isFiltered = !!filteredStats && (filteredStats.packageData?.length || filteredStats.monthlyData?.length);
+
+    // Use filtered package data if available, otherwise use all data
+    const packageData = isFiltered && filteredStats?.packageData
+        ? filteredStats.packageData
+        : currentStats?.npm ? [
+            { name: 'Core', downloads: currentStats.npm.downloads.last_month },
+            { name: 'React', downloads: currentStats.npm.react_package_downloads },
+            { name: 'Transaction', downloads: currentStats.npm.transaction_package_downloads },
+            { name: 'Wallet', downloads: currentStats.npm.wallet_package_downloads },
+            { name: 'Provider', downloads: currentStats.npm.provider_package_downloads },
+            { name: 'Core CSL', downloads: currentStats.npm.core_csl_package_downloads },
+            { name: 'Core CST', downloads: currentStats.npm.core_cst_package_downloads },
+        ] : [];
 
     const years = Object.keys(yearlyStats || {}).map(Number).sort((a, b) => b - a);
     const latestYear = years[0];
 
-    const monthlyData = latestYear && yearlyStats?.[latestYear]?.monthlyDownloads
-        ? yearlyStats[latestYear].monthlyDownloads.map(month => ({
-            name: month.month,
-            downloads: month.downloads,
-            trend: month.trend
-        }))
-        : [];
-
-    const versionSubtitle = currentStats?.npm?.latest_version
-        ? `Latest Version: ${currentStats.npm.latest_version}`
-        : undefined;
+    // Use filtered monthly data if available, otherwise use all data
+    const monthlyData = isFiltered && filteredStats?.monthlyData
+        ? filteredStats.monthlyData
+        : latestYear && yearlyStats?.[latestYear]?.monthlyDownloads
+            ? yearlyStats[latestYear].monthlyDownloads.map((month: MonthlyDownload) => ({
+                name: month.month,
+                downloads: month.downloads,
+                trend: month.trend
+            }))
+            : [];
 
     return (
         <div data-testid="mesh-stats-view">
-            <PageHeader
-                title={<>Mesh SDK <span>Statistics</span></>}
-                subtitle={versionSubtitle}
-            />
+            {isFiltered && (
+                <div className={styles.filterNotice}>
+                    <h2>Filtered Results</h2>
+                    <p>Showing filtered statistics based on your search criteria.</p>
+                </div>
+            )}
 
-            {currentStats?.npm?.downloads && (
+            {currentStats?.npm?.downloads && !isFiltered && (
                 <div className={styles.statsGrid}>
                     <div className={styles.stat}>
                         <h3>Last Week</h3>
@@ -113,7 +127,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) =>
                 </div>
             )}
 
-            {currentStats?.github && (
+            {currentStats?.github && !isFiltered && (
                 <div className={styles.githubStats}>
                     <h2>GitHub Usage</h2>
                     <div className={styles.statsGrid}>
@@ -137,7 +151,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) =>
 
             {packageData.length > 0 && (
                 <div className={styles.chartSection}>
-                    <h2>Package Downloads (Last Month)</h2>
+                    <h2>Package Downloads {isFiltered ? '(Filtered)' : '(Last Month)'}</h2>
                     <div className={styles.chart}>
                         <ResponsiveContainer width="100%" height={400}>
                             <BarChart data={packageData}>
@@ -155,7 +169,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) =>
 
             {monthlyData.length > 0 && (
                 <div className={styles.chartSection}>
-                    <h2>Monthly Downloads Trend ({latestYear})</h2>
+                    <h2>Monthly Downloads Trend {isFiltered ? '(Filtered)' : `(${latestYear})`}</h2>
                     <div className={styles.chart}>
                         <ResponsiveContainer width="100%" height={400}>
                             <BarChart data={monthlyData}>
@@ -171,7 +185,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats }) =>
                 </div>
             )}
 
-            {years.length > 0 && (
+            {years.length > 0 && !isFiltered && (
                 <div className={styles.chartSection}>
                     <h2>Yearly Comparison</h2>
                     <div className={styles.yearGrid}>
