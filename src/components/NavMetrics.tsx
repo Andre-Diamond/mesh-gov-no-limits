@@ -9,8 +9,19 @@ const NavMetrics = () => {
     // Calculate metrics
     const totalVotes = meshData?.votes?.length || 0;
     const allVotes = meshData?.votes || [];
-    const yesVotes = allVotes.filter(v => v.vote === 'Yes').length;
-    const noVotes = allVotes.filter(v => v.vote === 'No').length;
+
+    // Calculate yearly vote statistics
+    const yearlyVotes = allVotes.reduce((acc: Record<string, { yes: number; no: number; abstain: number }>, vote) => {
+        const year = new Date(vote.blockTime).getFullYear();
+        if (!acc[year]) {
+            acc[year] = { yes: 0, no: 0, abstain: 0 };
+        }
+        acc[year][vote.vote.toLowerCase() as 'yes' | 'no' | 'abstain']++;
+        return acc;
+    }, {});
+
+    // Sort years in descending order
+    const sortedYears = Object.keys(yearlyVotes).sort((a, b) => Number(b) - Number(a));
 
     const totalProposals = catalystData?.catalystData?.projects?.length || 0;
     const completedProposals = catalystData?.catalystData?.projects?.filter(
@@ -41,12 +52,27 @@ const NavMetrics = () => {
                     <span className={styles.metricTitle}>DRep Voting</span>
                     <div className={`${styles.metricIcon} ${styles.iconGreen}`}></div>
                 </div>
-                <div className={styles.metricValue}>{totalVotes}</div>
-                <div className={styles.metricSubtext}>
-                    {yesVotes} Yes • {noVotes} No votes
-                </div>
-                <div className={styles.metricExtra}>
-                    Last vote: {allVotes[0] ? new Date(allVotes[0].blockTime).toLocaleDateString() : 'N/A'}
+                <div className={styles.yearlyTable}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Yes</th>
+                                <th>No</th>
+                                <th>Abs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortedYears.map(year => (
+                                <tr key={year}>
+                                    <td>{year}</td>
+                                    <td>{yearlyVotes[year].yes}</td>
+                                    <td>{yearlyVotes[year].no}</td>
+                                    <td>{yearlyVotes[year].abstain}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

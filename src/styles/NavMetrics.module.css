@@ -63,7 +63,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-color);
-    margin: 0.25rem 0;
+    margin: 0.25rem 0 0.75rem 0;
 }
 
 .metricSubtext {
@@ -84,6 +84,42 @@
     padding-top: 0.25rem;
     border-top: 1px solid var(--border-color);
     opacity: 0.8;
+}
+
+.yearlyTable {
+    margin-top: 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.yearlyTable table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+}
+
+.yearlyTable th,
+.yearlyTable td {
+    padding: 0.25rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.yearlyTable th {
+    font-weight: 500;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    opacity: 0.8;
+    padding-top: 0.5rem;
+}
+
+.yearlyTable td {
+    font-weight: 500;
+}
+
+.yearlyTable tr:hover td {
+    color: var(--text-color);
+    background-color: var(--sidebar-hover);
 }
 
 /* Hide metrics on mobile */
