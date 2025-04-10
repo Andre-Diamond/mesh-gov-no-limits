@@ -206,7 +206,7 @@ export default function Home() {
     const [filteredVotes, setFilteredVotes] = useState<GovernanceVote[]>(drepVotingData?.votes || []);
     const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>(catalystData?.catalystData?.projects || []);
     const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
-    console.log('data', drepVotingData, catalystData, meshData);
+    
     if (isLoading) {
         return (
             <div className={styles.container}>

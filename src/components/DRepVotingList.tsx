@@ -59,10 +59,10 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes }) => {
                             <div>Block Time: {formatDate(vote.blockTime)}</div>
                         </div>
                         <div className={styles.links}>
-                            <a href={`https://cardanoscan.io/transaction/${vote.proposalTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                            <a href={`https://adastat.net/governances/${vote.proposalTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
                                 View Proposal
                             </a>
-                            <a href={`https://cardanoscan.io/transaction/${vote.voteTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                            <a href={`https://adastat.net/transactions/${vote.voteTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
                                 View Vote
                             </a>
                         </div>
