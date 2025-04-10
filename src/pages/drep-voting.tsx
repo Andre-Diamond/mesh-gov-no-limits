@@ -23,18 +23,18 @@ interface VoteData {
 }
 
 export default function DRepVoting() {
-    const { meshData, isLoading, error } = useData();
+    const { drepVotingData, isLoading, error } = useData();
     const [filteredVotes, setFilteredVotes] = useState<VoteData[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
 
     // Generate dynamic filter config based on available votes data
     const dynamicFilterConfig = useMemo(() => {
-        if (!meshData?.votes) return {
+        if (!drepVotingData?.votes) return {
             placeholder: "Search votes...",
             filters: [],
         } as SearchFilterConfig;
-        return generateDrepVotingFilterConfig(meshData.votes);
-    }, [meshData]);
+        return generateDrepVotingFilterConfig(drepVotingData.votes);
+    }, [drepVotingData]);
 
     if (isLoading) {
         return (
@@ -52,7 +52,7 @@ export default function DRepVoting() {
         );
     }
 
-    const votes = meshData?.votes || [];
+    const votes = drepVotingData?.votes || [];
 
     // Stats calculated from the complete dataset
     const voteStats = {

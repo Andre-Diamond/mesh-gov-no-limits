@@ -111,6 +111,10 @@ export interface CurrentStats {
 export interface MeshData {
     currentStats: CurrentStats;
     yearlyStats: Record<number, YearlyStats>;
+    lastFetched: number;
+}
+
+export interface DRepVotingData {
     votes: GovernanceVote[];
     lastFetched: number;
 }
@@ -123,6 +127,7 @@ export interface CatalystContextData {
 export interface DataContextType {
     meshData: MeshData | null;
     catalystData: CatalystContextData | null;
+    drepVotingData: DRepVotingData | null;
     isLoading: boolean;
     error: string | null;
     refetchData: () => Promise<void>;

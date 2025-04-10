@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import fetchData from '../lib/fetchData';
-import { MeshData, CatalystContextData } from '../types';
+import { MeshData, CatalystContextData, DRepVotingData } from '../types';
 
 interface DataContextType {
     meshData: MeshData | null;
     catalystData: CatalystContextData | null;
+    drepVotingData: DRepVotingData | null;
     isLoading: boolean;
     error: string | null;
     refetchData: () => Promise<void>;
@@ -18,6 +19,7 @@ const CACHE_DURATION = process.env.NEXT_PUBLIC_ENABLE_DEV_CACHE === 'false'
     : 3 * 24 * 60 * 60 * 1000;
 const MESH_STORAGE_KEY = 'meshGovData';
 const CATALYST_STORAGE_KEY = 'catalystData';
+const DREP_VOTING_STORAGE_KEY = 'drepVotingData';
 
 // Utility function to check if localStorage is available
 const isLocalStorageAvailable = (): boolean => {
@@ -56,6 +58,7 @@ const safeSetItem = (key: string, value: string): void => {
 export function DataProvider({ children }: { children: React.ReactNode }) {
     const [meshData, setMeshData] = useState<MeshData | null>(null);
     const [catalystData, setCatalystData] = useState<CatalystContextData | null>(null);
+    const [drepVotingData, setDrepVotingData] = useState<DRepVotingData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -97,15 +100,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 currentStats = null;
             }
 
-            // Fetch yearly stats and votes for all years
+            // Fetch yearly stats
             console.log('Fetching yearly stats for years:', years);
             const yearlyStatsPromises = years.map(year => fetchYearlyStats(year));
-            const yearlyVotesPromises = years.map(year => fetchYearlyVotes(year));
-
-            const [yearlyStatsResults, yearlyVotesResults] = await Promise.all([
-                Promise.all(yearlyStatsPromises),
-                Promise.all(yearlyVotesPromises)
-            ]);
+            const yearlyStatsResults = await Promise.all(yearlyStatsPromises);
 
             console.log('Yearly stats results:', yearlyStatsResults);
 
@@ -119,12 +117,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
             console.log('Processed yearly stats:', yearlyStats);
 
-            // Combine all votes and sort by blockTime, filtering out null results
-            const allVotes = yearlyVotesResults
-                .filter(votes => votes !== null)
-                .flat()
-                .sort((a, b) => new Date(b.blockTime).getTime() - new Date(a.blockTime).getTime());
-
             // Only save data if we have at least current stats or some yearly stats
             if (!currentStats && Object.keys(yearlyStats).length === 0) {
                 throw new Error('No mesh data available');
@@ -133,7 +125,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             const newData: MeshData = {
                 currentStats,
                 yearlyStats,
-                votes: allVotes,
                 lastFetched: Date.now()
             };
 
@@ -145,6 +136,39 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             console.error('Error fetching mesh data:', err);
             setError('Failed to fetch mesh data');
             setMeshData(null);
+        }
+    };
+
+    const fetchDRepVotingData = async () => {
+        try {
+            console.log('Fetching DRep voting data...');
+            const currentYear = getCurrentYear();
+            const startYear = 2024;
+            const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
+
+            // Fetch yearly votes
+            const yearlyVotesResults = await Promise.all(years.map(year => fetchYearlyVotes(year)));
+
+            // Combine all votes and sort by blockTime, filtering out null results
+            const allVotes = yearlyVotesResults
+                .filter(votes => votes !== null)
+                .flat()
+                .sort((a, b) => new Date(b.blockTime).getTime() - new Date(a.blockTime).getTime());
+
+            if (allVotes.length === 0) {
+                throw new Error('No voting data available');
+            }
+
+            const newData: DRepVotingData = {
+                votes: allVotes,
+                lastFetched: Date.now()
+            };
+
+            safeSetItem(DREP_VOTING_STORAGE_KEY, JSON.stringify(newData));
+            setDrepVotingData(newData);
+        } catch (err) {
+            console.error('Error fetching DRep voting data:', err);
+            setDrepVotingData(null);
         }
     };
 
@@ -165,21 +189,23 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
     const loadData = async () => {
         setIsLoading(true);
-        setError(null); // Reset error state
+        setError(null);
 
         try {
-            // Check if caching is disabled or localStorage is not available
             if (process.env.NEXT_PUBLIC_ENABLE_DEV_CACHE === 'false' || !isLocalStorageAvailable()) {
                 console.log(isLocalStorageAvailable()
-                    ? 'Cache disabled: Fetching fresh data for both mesh and catalyst data'
+                    ? 'Cache disabled: Fetching fresh data'
                     : 'localStorage not available: Fetching fresh data');
-                await Promise.all([fetchMeshData(), fetchCatalystData()]);
+                await Promise.all([fetchMeshData(), fetchCatalystData(), fetchDRepVotingData()]);
                 setIsLoading(false);
                 return;
             }
 
             console.log('Cache enabled: Checking cache status...');
             const cachedMeshData = safeGetItem(MESH_STORAGE_KEY);
+            const cachedCatalystData = safeGetItem(CATALYST_STORAGE_KEY);
+            const cachedDRepVotingData = safeGetItem(DREP_VOTING_STORAGE_KEY);
+
             if (cachedMeshData) {
                 const parsed = JSON.parse(cachedMeshData);
                 const cacheAge = Date.now() - parsed.lastFetched;
@@ -189,11 +215,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     console.log(`Mesh data cache expired (age: ${Math.round(cacheAge / 1000 / 60)} minutes), fetching fresh data`);
                 }
-            } else {
-                console.log('No cached mesh data found, will fetch fresh data');
             }
 
-            const cachedCatalystData = safeGetItem(CATALYST_STORAGE_KEY);
             if (cachedCatalystData) {
                 const parsed = JSON.parse(cachedCatalystData);
                 const cacheAge = Date.now() - parsed.lastFetched;
@@ -203,14 +226,24 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     console.log(`Catalyst data cache expired (age: ${Math.round(cacheAge / 1000 / 60)} minutes), fetching fresh data`);
                 }
-            } else {
-                console.log('No cached catalyst data found, will fetch fresh data');
+            }
+
+            if (cachedDRepVotingData) {
+                const parsed = JSON.parse(cachedDRepVotingData);
+                const cacheAge = Date.now() - parsed.lastFetched;
+                if (cacheAge < CACHE_DURATION) {
+                    console.log(`Using cached DRep voting data (cache age: ${Math.round(cacheAge / 1000 / 60)} minutes)`);
+                    setDrepVotingData(parsed);
+                } else {
+                    console.log(`DRep voting data cache expired (age: ${Math.round(cacheAge / 1000 / 60)} minutes), fetching fresh data`);
+                }
             }
 
             // Fetch fresh data if cache is expired or missing
             await Promise.all([
                 (!cachedMeshData || Date.now() - JSON.parse(cachedMeshData).lastFetched >= CACHE_DURATION) && fetchMeshData(),
-                (!cachedCatalystData || Date.now() - JSON.parse(cachedCatalystData).lastFetched >= CACHE_DURATION) && fetchCatalystData()
+                (!cachedCatalystData || Date.now() - JSON.parse(cachedCatalystData).lastFetched >= CACHE_DURATION) && fetchCatalystData(),
+                (!cachedDRepVotingData || Date.now() - JSON.parse(cachedDRepVotingData).lastFetched >= CACHE_DURATION) && fetchDRepVotingData()
             ]);
         } catch (err) {
             console.error('Error loading data:', err);
@@ -226,12 +259,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
     const refetchData = async () => {
         setIsLoading(true);
-        await Promise.all([fetchMeshData(), fetchCatalystData()]);
+        await Promise.all([fetchMeshData(), fetchCatalystData(), fetchDRepVotingData()]);
         setIsLoading(false);
     };
 
     return (
-        <DataContext.Provider value={{ meshData, catalystData, isLoading, error, refetchData }}>
+        <DataContext.Provider value={{ meshData, catalystData, drepVotingData, isLoading, error, refetchData }}>
             {children}
         </DataContext.Provider>
     );
