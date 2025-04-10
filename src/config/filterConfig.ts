@@ -30,8 +30,7 @@ export const dashboardFilterConfig: SearchFilterConfig = {
             label: 'Result Type',
             options: [
                 { label: 'DRep Votes', value: 'vote' },
-                { label: 'Catalyst Proposals', value: 'proposal' },
-                { label: 'Mesh Stats', value: 'stat' }
+                { label: 'Catalyst Proposals', value: 'proposal' }
             ]
         }
     ]
@@ -43,7 +42,7 @@ export const generateDrepVotingFilterConfig = (votes: any[]): SearchFilterConfig
     const proposalTypes = getProposalTypes(votes);
 
     return {
-        placeholder: 'Search votes by title, rationale, or type...',
+        placeholder: 'Search votes by title, proposal ID, rationale, or type...',
         filters: [
             {
                 id: 'vote',
@@ -72,7 +71,7 @@ export const generateCatalystProposalsFilterConfig = (projects: any[]): SearchFi
     const fundingRounds = extractFundingRounds(projects);
 
     return {
-        placeholder: 'Search proposals by title, funding round, or status...',
+        placeholder: 'Search proposals by title, project ID, funding round, or status...',
         filters: [
             {
                 id: 'status',
@@ -132,7 +131,8 @@ export const filterVotes = (votes: any[], searchTerm: string, filters: Record<st
         const searchMatch = !searchTerm ||
             vote.proposalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
             vote.proposalType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            vote.rationale.toLowerCase().includes(searchTerm.toLowerCase());
+            vote.rationale.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            vote.proposalId.toLowerCase().includes(searchTerm.toLowerCase());
 
         // Apply individual filters
         const voteMatch = !filters.vote || vote.vote === filters.vote;
@@ -150,7 +150,8 @@ export const filterProposals = (projects: any[], searchTerm: string, filters: Re
         // Search term filter - check across multiple fields
         const searchMatch = !searchTerm ||
             project.projectDetails.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            project.projectDetails.category.toLowerCase().includes(searchTerm.toLowerCase());
+            project.projectDetails.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            project.projectDetails.project_id.toString().includes(searchTerm);
 
         // Extract funding round from category (first 3 characters)
         const fundingRound = project.projectDetails.category.substring(0, 3);

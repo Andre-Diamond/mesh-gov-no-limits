@@ -4,7 +4,8 @@ import styles from '../styles/Voting.module.css';
 import PageHeader from '../components/PageHeader';
 import SearchFilterBar, { SearchFilterConfig } from '../components/SearchFilterBar';
 import { filterVotes, generateDrepVotingFilterConfig } from '../config/filterConfig';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 interface VoteData {
     proposalId: string;
@@ -26,6 +27,7 @@ export default function DRepVoting() {
     const { drepVotingData, isLoading, error } = useData();
     const [filteredVotes, setFilteredVotes] = useState<VoteData[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+    const router = useRouter();
 
     // Generate dynamic filter config based on available votes data
     const dynamicFilterConfig = useMemo(() => {
@@ -35,6 +37,16 @@ export default function DRepVoting() {
         } as SearchFilterConfig;
         return generateDrepVotingFilterConfig(drepVotingData.votes);
     }, [drepVotingData]);
+
+    // Handle URL search parameter
+    useEffect(() => {
+        if (router.isReady && router.query.search && drepVotingData?.votes) {
+            const searchTerm = router.query.search as string;
+            const filtered = filterVotes(drepVotingData.votes, searchTerm, {});
+            setFilteredVotes(filtered);
+            setIsSearching(true);
+        }
+    }, [router.isReady, router.query.search, drepVotingData]);
 
     if (isLoading) {
         return (
@@ -72,12 +84,18 @@ export default function DRepVoting() {
         if (!searchTerm && Object.keys(activeFilters).length === 0) {
             setFilteredVotes([]);
             setIsSearching(false);
+            // Clear the search parameter from URL
+            router.push('/drep-voting', undefined, { shallow: true });
             return;
         }
 
         setIsSearching(true);
         const filtered = filterVotes(votes, searchTerm, activeFilters);
         setFilteredVotes(filtered);
+        // Update URL with search term
+        if (searchTerm) {
+            router.push(`/drep-voting?search=${searchTerm}`, undefined, { shallow: true });
+        }
     };
 
     // Decide which votes to display
@@ -93,6 +111,7 @@ export default function DRepVoting() {
             <SearchFilterBar
                 config={dynamicFilterConfig}
                 onSearch={handleSearch}
+                initialSearchTerm={router.query.search as string}
             />
 
             <div className={styles.stats} data-testid="voting-stats">

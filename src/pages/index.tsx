@@ -56,7 +56,7 @@ const CatalystProposalsCard = ({ projects }: { projects: CatalystProject[] }) =>
 
     // Handle row click
     const handleRowClick = (projectId: number) => {
-        router.push(`/project-details/${projectId}`);
+        router.push(`/catalyst-proposals?search=${projectId}`);
     };
 
     return (
@@ -140,7 +140,7 @@ const VotingTableCard = ({ votes }: { votes: GovernanceVote[] }) => {
 
     // Handle row click
     const handleRowClick = (proposalId: string) => {
-        router.push(`/vote-details/${proposalId}`);
+        router.push(`/drep-voting?search=${proposalId}`);
     };
 
     return (

@@ -4,8 +4,9 @@ import styles from '../styles/Proposals.module.css';
 import PageHeader from '../components/PageHeader';
 import SearchFilterBar, { SearchFilterConfig } from '../components/SearchFilterBar';
 import { filterProposals, generateCatalystProposalsFilterConfig } from '../config/filterConfig';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { CatalystData, CatalystProject } from '../types';
+import { useRouter } from 'next/router';
 
 // Simple number formatting function that doesn't rely on locale settings
 const formatNumber = (num: number): string => {
@@ -21,6 +22,7 @@ export default function CatalystProposals() {
     const { catalystData, isLoading, error } = useData();
     const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+    const router = useRouter();
 
     // Generate dynamic filter config based on available data
     const dynamicFilterConfig = useMemo(() => {
@@ -30,6 +32,16 @@ export default function CatalystProposals() {
         } as SearchFilterConfig;
         return generateCatalystProposalsFilterConfig(catalystData.catalystData.projects);
     }, [catalystData]);
+
+    // Handle URL search parameter
+    useEffect(() => {
+        if (router.isReady && router.query.search && catalystData?.catalystData) {
+            const searchTerm = router.query.search as string;
+            const filtered = filterProposals(catalystData.catalystData.projects, searchTerm, {});
+            setFilteredProjects(filtered);
+            setIsSearching(true);
+        }
+    }, [router.isReady, router.query.search, catalystData]);
 
     if (isLoading) {
         return (
@@ -62,12 +74,18 @@ export default function CatalystProposals() {
         if (!searchTerm && Object.keys(activeFilters).length === 0) {
             setFilteredProjects([]);
             setIsSearching(false);
+            // Clear the search parameter from URL
+            router.push('/catalyst-proposals', undefined, { shallow: true });
             return;
         }
 
         setIsSearching(true);
         const filtered = filterProposals(data.projects, searchTerm, activeFilters);
         setFilteredProjects(filtered);
+        // Update URL with search term
+        if (searchTerm) {
+            router.push(`/catalyst-proposals?search=${searchTerm}`, undefined, { shallow: true });
+        }
     };
 
     // Calculate stats based on all projects, not just filtered ones
@@ -91,6 +109,7 @@ export default function CatalystProposals() {
             <SearchFilterBar
                 config={dynamicFilterConfig}
                 onSearch={handleSearch}
+                initialSearchTerm={router.query.search as string}
             />
 
             <div className={styles.stats} role="region" aria-label="statistics">

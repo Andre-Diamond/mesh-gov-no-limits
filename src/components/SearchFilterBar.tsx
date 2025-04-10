@@ -20,12 +20,21 @@ export interface SearchFilterConfig {
 interface SearchFilterBarProps {
     config: SearchFilterConfig;
     onSearch: (searchTerm: string, activeFilters: Record<string, string>) => void;
+    initialSearchTerm?: string;
 }
 
-const SearchFilterBar: FC<SearchFilterBarProps> = ({ config, onSearch }) => {
-    const [searchTerm, setSearchTerm] = useState<string>('');
+const SearchFilterBar: FC<SearchFilterBarProps> = ({ config, onSearch, initialSearchTerm = '' }) => {
+    const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
     const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
     const [showFilters, setShowFilters] = useState<boolean>(false);
+
+    // Initialize search term from prop
+    useEffect(() => {
+        if (initialSearchTerm) {
+            setSearchTerm(initialSearchTerm);
+            onSearch(initialSearchTerm, {});
+        }
+    }, [initialSearchTerm]);
 
     // Debounce search to avoid too frequent updates
     const debouncedSearch = useCallback(
