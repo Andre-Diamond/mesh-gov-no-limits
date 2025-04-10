@@ -1,18 +1,19 @@
 import { useData } from '../contexts/DataContext';
 import styles from '../styles/NavMetrics.module.css';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { GovernanceVote } from '../types';
 
 const NavMetrics = () => {
-    const { meshData, catalystData, isLoading } = useData();
+    const { drepVotingData, catalystData, meshData, isLoading } = useData();
 
     if (isLoading) return null;
 
     // Calculate metrics
-    const totalVotes = meshData?.votes?.length || 0;
-    const allVotes = meshData?.votes || [];
+    const totalVotes = drepVotingData?.votes?.length || 0;
+    const allVotes = drepVotingData?.votes || [];
 
     // Calculate yearly vote statistics
-    const yearlyVotes = allVotes.reduce((acc: Record<string, { yes: number; no: number; abstain: number }>, vote) => {
+    const yearlyVotes = allVotes.reduce((acc: Record<string, { yes: number; no: number; abstain: number }>, vote: GovernanceVote) => {
         const year = new Date(vote.blockTime).getFullYear();
         if (!acc[year]) {
             acc[year] = { yes: 0, no: 0, abstain: 0 };
