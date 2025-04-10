@@ -154,3 +154,10 @@
     color: var(--text-secondary);
     font-size: 0.9rem;
 }
+
+.statsHeader {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}

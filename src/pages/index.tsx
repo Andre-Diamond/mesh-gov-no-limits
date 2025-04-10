@@ -7,6 +7,7 @@ import SearchFilterBar from '../components/SearchFilterBar';
 import { dashboardFilterConfig } from '../config/filterConfig';
 import { useState } from 'react';
 import Link from 'next/link';
+import { CatalystProject, GovernanceVote } from '../types';
 
 // Simple number formatting function
 const formatNumber = (num: number): string => {
@@ -23,47 +24,13 @@ const formatDate = (dateString: string): string => {
     }).format(date);
 };
 
-// Type definitions
-interface ProjectDetails {
-    id: number;
-    title: string;
-    budget: number;
-    milestones_qty: number;
-    funds_distributed: number;
-    project_id: number;
-    category: string;
-    status: string;
-    finished: string;
-}
-
-interface Project {
-    projectDetails: ProjectDetails;
-    milestonesCompleted: number;
-}
-
 // Extended project interface with completion percentage
-interface ProjectWithCompletion extends Project {
+interface ProjectWithCompletion extends CatalystProject {
     completionPercentage: number;
 }
 
-interface VoteData {
-    proposalId: string;
-    proposalTxHash: string;
-    proposalIndex: number;
-    voteTxHash: string;
-    blockTime: string;
-    vote: 'Yes' | 'No' | 'Abstain';
-    metaUrl: string | null;
-    metaHash: string | null;
-    proposalTitle: string;
-    proposalType: string;
-    proposedEpoch: number;
-    expirationEpoch: number;
-    rationale: string;
-}
-
 // Component to display compact catalyst proposals overview
-const CatalystProposalsCard = ({ projects }: { projects: Project[] }) => {
+const CatalystProposalsCard = ({ projects }: { projects: CatalystProject[] }) => {
     const router = useRouter();
 
     // Extract funding round from category (first 3 letters)
@@ -73,7 +40,7 @@ const CatalystProposalsCard = ({ projects }: { projects: Project[] }) => {
     };
 
     // Calculate completion percentage for display
-    const calculateCompletion = (project: Project): number => {
+    const calculateCompletion = (project: CatalystProject): number => {
         if (project.projectDetails.milestones_qty === 0) return 0;
         return Math.round((project.milestonesCompleted / project.projectDetails.milestones_qty) * 100);
     };
@@ -89,7 +56,7 @@ const CatalystProposalsCard = ({ projects }: { projects: Project[] }) => {
 
     // Handle row click
     const handleRowClick = (projectId: number) => {
-        router.push(`/project-details/${projectId}`);
+        router.push(`/catalyst-proposals?search=${projectId}`);
     };
 
     return (
@@ -158,7 +125,7 @@ const CatalystProposalsCard = ({ projects }: { projects: Project[] }) => {
 };
 
 // Component to display voting table
-const VotingTableCard = ({ votes }: { votes: VoteData[] }) => {
+const VotingTableCard = ({ votes }: { votes: GovernanceVote[] }) => {
     const router = useRouter();
 
     // Get vote icon color
@@ -173,7 +140,7 @@ const VotingTableCard = ({ votes }: { votes: VoteData[] }) => {
 
     // Handle row click
     const handleRowClick = (proposalId: string) => {
-        router.push(`/vote-details/${proposalId}`);
+        router.push(`/drep-voting?search=${proposalId}`);
     };
 
     return (
@@ -234,12 +201,12 @@ const VotingTableCard = ({ votes }: { votes: VoteData[] }) => {
 };
 
 export default function Home() {
-    const { meshData, catalystData, isLoading, error, refetchData } = useData();
+    const { meshData, catalystData, drepVotingData, isLoading, error, refetchData } = useData();
     const router = useRouter();
-    const [filteredVotes, setFilteredVotes] = useState(meshData?.votes || []);
-    const [filteredProjects, setFilteredProjects] = useState(catalystData?.catalystData?.projects || []);
+    const [filteredVotes, setFilteredVotes] = useState<GovernanceVote[]>(drepVotingData?.votes || []);
+    const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>(catalystData?.catalystData?.projects || []);
     const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
-
+    
     if (isLoading) {
         return (
             <div className={styles.container}>
@@ -259,10 +226,10 @@ export default function Home() {
     // Calculate totals
     const totalProposals = catalystData?.catalystData?.projects?.length || 0;
     const completedProposals = catalystData?.catalystData?.projects?.filter(
-        (p: Project) => p.projectDetails.status === 'Completed'
+        (p: CatalystProject) => p.projectDetails.status === 'Completed'
     ).length || 0;
-    const totalVotes = meshData?.votes?.length || 0;
-    const allVotes = meshData?.votes || [];
+    const totalVotes = drepVotingData?.votes?.length || 0;
+    const allVotes = drepVotingData?.votes || [];
 
     // SDK download stats
     const downloads = meshData?.currentStats?.npm?.downloads;
@@ -270,19 +237,19 @@ export default function Home() {
 
     // Calculate project categories
     const categories: Record<string, number> = {};
-    catalystData?.catalystData?.projects?.forEach((project: Project) => {
+    catalystData?.catalystData?.projects?.forEach((project: CatalystProject) => {
         const category = project.projectDetails.category;
         categories[category] = (categories[category] || 0) + 1;
     });
 
     // Get projects closest to completion (but not completed)
     const projectsNearCompletion = catalystData?.catalystData?.projects
-        ?.filter((project: Project) =>
+        ?.filter((project: CatalystProject) =>
             project.projectDetails.status !== 'Completed' &&
             project.projectDetails.milestones_qty > 0 &&
             project.milestonesCompleted > 0
         )
-        .map((project: Project): ProjectWithCompletion => ({
+        .map((project: CatalystProject): ProjectWithCompletion => ({
             ...project,
             completionPercentage: Math.round((project.milestonesCompleted / project.projectDetails.milestones_qty) * 100)
         }))
@@ -296,7 +263,7 @@ export default function Home() {
     const handleSearch = (searchTerm: string, filters: Record<string, string>) => {
         // Clear filters if empty search
         if (!searchTerm && Object.keys(filters).length === 0) {
-            setFilteredVotes(meshData?.votes || []);
+            setFilteredVotes(drepVotingData?.votes || []);
             setFilteredProjects(catalystData?.catalystData?.projects || []);
             setIsSearchActive(false);
             return;
@@ -307,7 +274,7 @@ export default function Home() {
 
         // Filter votes
         if (!searchType || searchType === 'vote') {
-            const matchingVotes = meshData?.votes?.filter(vote => {
+            const matchingVotes = drepVotingData?.votes?.filter((vote: GovernanceVote) => {
                 return vote.proposalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     vote.proposalType.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     vote.rationale.toLowerCase().includes(searchTerm.toLowerCase());
@@ -319,7 +286,7 @@ export default function Home() {
 
         // Filter catalyst proposals
         if (!searchType || searchType === 'proposal') {
-            const matchingProjects = catalystData?.catalystData?.projects?.filter((project: Project) => {
+            const matchingProjects = catalystData?.catalystData?.projects?.filter((project: CatalystProject) => {
                 return project.projectDetails.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     project.projectDetails.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     project.projectDetails.status.toLowerCase().includes(searchTerm.toLowerCase());

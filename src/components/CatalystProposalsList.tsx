@@ -55,9 +55,10 @@ interface Project {
 
 interface CatalystProposalsListProps {
     data: CatalystData;
+    onRowClick?: (projectId: number) => void;
 }
 
-const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data }) => {
+const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data, onRowClick }) => {
     // Format the timestamp consistently using UTC to avoid timezone issues
     const formatDate = (timestamp: string): string => {
         const date = new Date(timestamp);
@@ -84,7 +85,12 @@ const CatalystProposalsList: FC<CatalystProposalsListProps> = ({ data }) => {
                     const formattedTitle = formatTitleForUrl(project.projectDetails.title);
 
                     return (
-                        <li key={project.projectDetails.id} className={styles.card} data-testid="proposal-item">
+                        <li
+                            key={project.projectDetails.id}
+                            className={`${styles.card} ${onRowClick ? styles.clickable : ''}`}
+                            data-testid="proposal-item"
+                            onClick={() => onRowClick && onRowClick(project.projectDetails.project_id)}
+                        >
                             <div className={styles.header}>
                                 <h3 className={styles.title}>{project.projectDetails.title}</h3>
                                 <span className={`${styles.status} ${project.projectDetails.status === 'Completed' ? styles.completed :

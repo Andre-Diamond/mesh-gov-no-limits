@@ -1,5 +1,6 @@
 import { FC, useState, useEffect, useCallback } from 'react';
 import styles from '../styles/SearchFilterBar.module.css';
+import { useRouter } from 'next/router';
 
 interface FilterOption {
     label: string;
@@ -20,19 +21,73 @@ export interface SearchFilterConfig {
 interface SearchFilterBarProps {
     config: SearchFilterConfig;
     onSearch: (searchTerm: string, activeFilters: Record<string, string>) => void;
+    initialSearchTerm?: string;
 }
 
-const SearchFilterBar: FC<SearchFilterBarProps> = ({ config, onSearch }) => {
-    const [searchTerm, setSearchTerm] = useState<string>('');
+const SearchFilterBar: FC<SearchFilterBarProps> = ({ config, onSearch, initialSearchTerm = '' }) => {
+    const router = useRouter();
+    const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
     const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
     const [showFilters, setShowFilters] = useState<boolean>(false);
+
+    // Initialize search term and filters from URL
+    useEffect(() => {
+        if (router.isReady) {
+            const { search, ...filterParams } = router.query;
+
+            // Set search term from URL
+            if (typeof search === 'string') {
+                setSearchTerm(search);
+            } else if (initialSearchTerm) {
+                setSearchTerm(initialSearchTerm);
+            }
+
+            // Set filters from URL
+            const urlFilters: Record<string, string> = {};
+            Object.entries(filterParams).forEach(([key, value]) => {
+                if (typeof value === 'string' && config.filters.some(f => f.id === key)) {
+                    urlFilters[key] = value;
+                }
+            });
+            setActiveFilters(urlFilters);
+
+            // Trigger initial search with URL parameters
+            if ((search || Object.keys(urlFilters).length > 0)) {
+                onSearch(typeof search === 'string' ? search : '', urlFilters);
+            }
+        }
+    }, [router.isReady, router.query, config.filters, initialSearchTerm]);
+
+    // Update URL when search or filters change
+    const updateUrl = useCallback((term: string, filters: Record<string, string>) => {
+        const query: Record<string, string> = {};
+
+        // Add search term to query if present
+        if (term) {
+            query.search = term;
+        }
+
+        // Add filters to query
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) {
+                query[key] = value;
+            }
+        });
+
+        // Update URL without refreshing the page
+        router.push({
+            pathname: router.pathname,
+            query
+        }, undefined, { shallow: true });
+    }, [router]);
 
     // Debounce search to avoid too frequent updates
     const debouncedSearch = useCallback(
         (term: string, filters: Record<string, string>) => {
             onSearch(term, filters);
+            updateUrl(term, filters);
         },
-        [onSearch]
+        [onSearch, updateUrl]
     );
 
     // Update search results when search term or filters change
@@ -62,6 +117,8 @@ const SearchFilterBar: FC<SearchFilterBarProps> = ({ config, onSearch }) => {
     const handleClearAll = () => {
         setSearchTerm('');
         setActiveFilters({});
+        // Clear URL parameters
+        router.push(router.pathname, undefined, { shallow: true });
     };
 
     const activeFilterCount = Object.keys(activeFilters).length;

@@ -67,20 +67,23 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats, filt
             )}
 
             {currentStats?.npm?.downloads && !isFiltered && (
-                <div className={styles.statsGrid}>
-                    <div className={styles.stat}>
-                        <h3>Last Week</h3>
-                        <p>{formatNumber(currentStats.npm.downloads.last_week)}</p>
+                <>
+                    <h2 className={styles.statsHeader}>meshsdk/core downloads</h2>
+                    <div className={styles.statsGrid}>
+                        <div className={styles.stat}>
+                            <h3>Last Week</h3>
+                            <p>{formatNumber(currentStats.npm.downloads.last_week)}</p>
+                        </div>
+                        <div className={styles.stat}>
+                            <h3>Last Month</h3>
+                            <p>{formatNumber(currentStats.npm.downloads.last_month)}</p>
+                        </div>
+                        <div className={styles.stat}>
+                            <h3>Last Year</h3>
+                            <p>{formatNumber(currentStats.npm.downloads.last_year)}</p>
+                        </div>
                     </div>
-                    <div className={styles.stat}>
-                        <h3>Last Month</h3>
-                        <p>{formatNumber(currentStats.npm.downloads.last_month)}</p>
-                    </div>
-                    <div className={styles.stat}>
-                        <h3>Last Year</h3>
-                        <p>{formatNumber(currentStats.npm.downloads.last_year)}</p>
-                    </div>
-                </div>
+                </>
             )}
 
             {currentStats?.github && !isFiltered && (
@@ -95,10 +98,10 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats, filt
                             <h3>Total File References</h3>
                             <p>{formatNumber(currentStats.github.core_in_any_file)}</p>
                         </div>
-                        {currentStats.npm?.dependents_count && (
+                        {currentStats.contributors?.unique_count && (
                             <div className={styles.stat}>
-                                <h3>Dependent Projects</h3>
-                                <p>{formatNumber(currentStats.npm.dependents_count)}</p>
+                                <h3>GitHub Contributors</h3>
+                                <p>{formatNumber(currentStats.contributors.unique_count)}</p>
                             </div>
                         )}
                     </div>
@@ -125,7 +128,7 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats, filt
 
             {monthlyData.length > 0 && (
                 <div className={styles.chartSection}>
-                    <h2>Monthly Downloads Trend {isFiltered ? '(Filtered)' : `(${latestYear})`}</h2>
+                    <h2>meshsdk/core Monthly Downloads {isFiltered ? '(Filtered)' : `(${latestYear})`}</h2>
                     <div className={styles.chart}>
                         <ResponsiveContainer width="100%" height={400}>
                             <BarChart data={monthlyData}>

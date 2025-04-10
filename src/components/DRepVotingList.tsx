@@ -31,9 +31,10 @@ interface VoteData {
 
 interface DRepVotingListProps {
     votes: VoteData[];
+    onRowClick?: (proposalId: string) => void;
 }
 
-const DRepVotingList: FC<DRepVotingListProps> = ({ votes }) => {
+const DRepVotingList: FC<DRepVotingListProps> = ({ votes, onRowClick }) => {
     if (!votes || votes.length === 0) {
         return <div className={styles.empty}>No voting data available</div>;
     }
@@ -42,7 +43,12 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes }) => {
         <div className={styles.listContainer}>
             <ul className={styles.list}>
                 {votes.map((vote) => (
-                    <li key={vote.proposalId} className={styles.item} data-testid="vote-item">
+                    <li
+                        key={vote.proposalId}
+                        className={`${styles.item} ${onRowClick ? styles.clickable : ''}`}
+                        data-testid="vote-item"
+                        onClick={() => onRowClick && onRowClick(vote.proposalId)}
+                    >
                         <div className={styles.header}>
                             <h3 className={styles.title}>{vote.proposalTitle}</h3>
                             <span className={`${styles.vote} ${styles[vote.vote.toLowerCase()]}`}>
@@ -59,10 +65,10 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes }) => {
                             <div>Block Time: {formatDate(vote.blockTime)}</div>
                         </div>
                         <div className={styles.links}>
-                            <a href={`https://cardanoscan.io/transaction/${vote.proposalTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                            <a href={`https://adastat.net/governances/${vote.proposalTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
                                 View Proposal
                             </a>
-                            <a href={`https://cardanoscan.io/transaction/${vote.voteTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                            <a href={`https://adastat.net/transactions/${vote.voteTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
                                 View Vote
                             </a>
                         </div>
