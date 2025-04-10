@@ -42,12 +42,6 @@ const NavMetrics = () => {
 
     const remainingMilestones = milestonesStats.total - milestonesStats.completed;
 
-    console.log('Milestone Stats:', {
-        total: milestonesStats.total,
-        completed: milestonesStats.completed,
-        remaining: remainingMilestones
-    });
-
     const totalBudget = catalystData?.catalystData?.projects?.reduce(
         (sum: number, p: any) => sum + p.projectDetails.budget, 0
     ) || 0;
@@ -63,8 +57,6 @@ const NavMetrics = () => {
         { name: 'Completed Milestones', value: milestonesStats.completed },
         { name: 'Remaining Milestones', value: remainingMilestones }
     ];
-
-    console.log('Status Data:', statusData);
 
     const fundingData = [
         { name: 'Distributed', value: fundsDistributed },
