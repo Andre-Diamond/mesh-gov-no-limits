@@ -4,7 +4,7 @@ import styles from '../styles/Proposals.module.css';
 import PageHeader from '../components/PageHeader';
 import SearchFilterBar, { SearchFilterConfig } from '../components/SearchFilterBar';
 import { filterProposals, generateCatalystProposalsFilterConfig } from '../config/filterConfig';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { CatalystData, CatalystProject } from '../types';
 import { useRouter } from 'next/router';
 
@@ -23,25 +23,74 @@ export default function CatalystProposals() {
     const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const router = useRouter();
+    const [lastNavigationTime, setLastNavigationTime] = useState(0);
+
+    // Get data early to avoid conditional access
+    const data = catalystData?.catalystData;
+    const allProjects = data?.projects || [];
 
     // Generate dynamic filter config based on available data
     const dynamicFilterConfig = useMemo(() => {
-        if (!catalystData?.catalystData) return {
+        if (!data) return {
             placeholder: "Search proposals...",
             filters: [],
         } as SearchFilterConfig;
-        return generateCatalystProposalsFilterConfig(catalystData.catalystData.projects);
-    }, [catalystData]);
+        return generateCatalystProposalsFilterConfig(data.projects);
+    }, [data]);
+
+    // Calculate stats based on all projects
+    const stats = useMemo(() => ({
+        totalBudget: allProjects.reduce((sum: number, p: CatalystProject) => sum + p.projectDetails.budget, 0),
+        completedProjects: allProjects.filter((p: CatalystProject) => p.projectDetails.status === 'Completed').length,
+        totalProjects: allProjects.length
+    }), [allProjects]);
+
+    // Debounced URL update
+    const updateUrl = useCallback((searchTerm: string) => {
+        const now = Date.now();
+        if (now - lastNavigationTime < 1000) return; // Prevent updates within 1 second
+
+        if (searchTerm) {
+            router.push(`/catalyst-proposals?search=${searchTerm}`, undefined, { shallow: true });
+        } else {
+            router.push('/catalyst-proposals', undefined, { shallow: true });
+        }
+        setLastNavigationTime(now);
+    }, [router, lastNavigationTime]);
+
+    // Handle search and filtering
+    const handleSearch = useCallback((searchTerm: string, activeFilters: Record<string, string>) => {
+        if (!searchTerm && Object.keys(activeFilters).length === 0) {
+            setFilteredProjects([]);
+            setIsSearching(false);
+            updateUrl('');
+            return;
+        }
+
+        setIsSearching(true);
+        const filtered = filterProposals(allProjects, searchTerm, activeFilters);
+        setFilteredProjects(filtered);
+        updateUrl(searchTerm);
+    }, [allProjects, updateUrl]);
+
+    // Handle row click
+    const handleRowClick = useCallback((projectId: number) => {
+        const now = Date.now();
+        if (now - lastNavigationTime < 1000) return; // Prevent clicks within 1 second
+
+        router.push(`/catalyst-proposals?search=${projectId}`);
+        setLastNavigationTime(now);
+    }, [router, lastNavigationTime]);
 
     // Handle URL search parameter
     useEffect(() => {
-        if (router.isReady && router.query.search && catalystData?.catalystData) {
+        if (router.isReady && router.query.search && data) {
             const searchTerm = router.query.search as string;
-            const filtered = filterProposals(catalystData.catalystData.projects, searchTerm, {});
+            const filtered = filterProposals(data.projects, searchTerm, {});
             setFilteredProjects(filtered);
             setIsSearching(true);
         }
-    }, [router.isReady, router.query.search, catalystData]);
+    }, [router.isReady, router.query.search, data]);
 
     if (isLoading) {
         return (
@@ -59,39 +108,13 @@ export default function CatalystProposals() {
         );
     }
 
-    if (!catalystData?.catalystData) {
+    if (!data) {
         return (
             <div className={styles.container}>
                 <div className={styles.error}>No catalyst data available</div>
             </div>
         );
     }
-
-    const data = catalystData.catalystData;
-
-    // Handle search and filtering
-    const handleSearch = (searchTerm: string, activeFilters: Record<string, string>) => {
-        if (!searchTerm && Object.keys(activeFilters).length === 0) {
-            setFilteredProjects([]);
-            setIsSearching(false);
-            // Clear the search parameter from URL
-            router.push('/catalyst-proposals', undefined, { shallow: true });
-            return;
-        }
-
-        setIsSearching(true);
-        const filtered = filterProposals(data.projects, searchTerm, activeFilters);
-        setFilteredProjects(filtered);
-        // Update URL with search term
-        if (searchTerm) {
-            router.push(`/catalyst-proposals?search=${searchTerm}`, undefined, { shallow: true });
-        }
-    };
-
-    // Calculate stats based on all projects, not just filtered ones
-    const allProjects = data.projects;
-    const totalBudget = allProjects.reduce((sum: number, p: CatalystProject) => sum + p.projectDetails.budget, 0);
-    const completedProjects = allProjects.filter((p: CatalystProject) => p.projectDetails.status === 'Completed').length;
 
     // Determine which data to display
     const displayData = {
@@ -115,15 +138,15 @@ export default function CatalystProposals() {
             <div className={styles.stats} role="region" aria-label="statistics">
                 <div className={styles.stat}>
                     <h3>Total Projects</h3>
-                    <p aria-label="Total Projects">{allProjects.length}</p>
+                    <p aria-label="Total Projects">{stats.totalProjects}</p>
                 </div>
                 <div className={styles.stat}>
                     <h3>Total Budget</h3>
-                    <p aria-label="Total Budget">{formatAda(totalBudget)}</p>
+                    <p aria-label="Total Budget">{formatAda(stats.totalBudget)}</p>
                 </div>
                 <div className={styles.stat}>
                     <h3>Completed Projects</h3>
-                    <p aria-label="Completed Projects">{completedProjects}</p>
+                    <p aria-label="Completed Projects">{stats.completedProjects}</p>
                 </div>
             </div>
 
@@ -133,7 +156,7 @@ export default function CatalystProposals() {
                 </div>
             )}
 
-            <CatalystProposalsList data={displayData} />
+            <CatalystProposalsList data={displayData} onRowClick={handleRowClick} />
         </div>
     );
 } 
