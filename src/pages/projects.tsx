@@ -50,7 +50,7 @@ const projects: Project[] = [
     {
         id: '3',
         name: 'Multisig Platform',
-        description: 'Secure your treasury and participant in Cardano governance as a team with multi-signatureSecure your treasury and participant in Cardano governance as a team with multi-signature.',
+        description: 'Secure your treasury and participant in Cardano governance as a team with multi-signatureSecure your treasury and participant in Cardano governance as a team with multi-signature. With Fluidtoken & ClarityDAO',
         icon: '/wallet.png',
         url: 'https://github.com/MeshJS/multisig'
     }
