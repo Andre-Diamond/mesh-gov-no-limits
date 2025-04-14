@@ -1,17 +1,6 @@
 import { FC } from 'react';
 import styles from '../styles/Voting.module.css';
-
-// Format date to a readable format
-const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(date);
-};
+import { formatDate } from '../utils/dateUtils';
 
 interface VoteData {
     proposalId: string;
@@ -46,7 +35,6 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes, onRowClick }) => {
                     <li
                         key={vote.proposalId}
                         className={`${styles.item} ${onRowClick ? styles.clickable : ''}`}
-                        data-testid="vote-item"
                         onClick={() => onRowClick && onRowClick(vote.proposalId)}
                     >
                         <div className={styles.header}>
@@ -55,20 +43,36 @@ const DRepVotingList: FC<DRepVotingListProps> = ({ votes, onRowClick }) => {
                                 {vote.vote}
                             </span>
                         </div>
+                        
                         <div className={styles.type}>
                             Type: {vote.proposalType}
                         </div>
+                        
                         <p className={styles.rationale}>{vote.rationale}</p>
+                        
                         <div className={styles.meta}>
-                            <div>Proposed Epoch: {vote.proposedEpoch}</div>
-                            <div>Expiration Epoch: {vote.expirationEpoch}</div>
-                            <div>Block Time: {formatDate(vote.blockTime)}</div>
+                            <div>Proposed: {formatDate(vote.blockTime)}</div>
+                            <div>Epoch: {vote.proposedEpoch}</div>
+                            <div>Expires: {vote.expirationEpoch}</div>
                         </div>
+                        
                         <div className={styles.links}>
-                            <a href={`https://adastat.net/governances/${vote.proposalTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                            <a 
+                                href={`https://adastat.net/governances/${vote.proposalTxHash}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={styles.link}
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 View Proposal
                             </a>
-                            <a href={`https://adastat.net/transactions/${vote.voteTxHash}`} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                            <a 
+                                href={`https://adastat.net/transactions/${vote.voteTxHash}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={styles.link}
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 View Vote
                             </a>
                         </div>

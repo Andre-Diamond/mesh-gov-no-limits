@@ -133,22 +133,39 @@ export default function DRepVoting() {
                 initialSearchTerm={router.query.search as string}
             />
 
-            <div className={styles.stats} data-testid="voting-stats">
-                <div className={styles.stat}>
-                    <h3>Total Votes</h3>
-                    <p>{voteStats.total}</p>
-                </div>
-                <div className={styles.stat}>
-                    <h3>Yes Votes</h3>
-                    <p className={styles.yes}>{voteStats.yes}</p>
-                </div>
-                <div className={styles.stat}>
-                    <h3>No Votes</h3>
-                    <p className={styles.no}>{voteStats.no}</p>
-                </div>
-                <div className={styles.stat}>
-                    <h3>Abstained</h3>
-                    <p className={styles.abstain}>{voteStats.abstain}</p>
+            <div className={styles.votingProgress}>
+                <h2 className={styles.votingProgressTitle}>Voting Distribution</h2>
+                <div className={styles.progressBars}>
+                    <div className={styles.progressRow}>
+                        <div className={styles.progressLabel}>Yes</div>
+                        <div className={styles.progressBar}>
+                            <div 
+                                className={`${styles.progressFill} ${styles.yes}`} 
+                                style={{width: `${(voteStats.yes / voteStats.total) * 100}%`}}
+                            ></div>
+                        </div>
+                        <div className={styles.progressValue}>{voteStats.yes}</div>
+                    </div>
+                    <div className={styles.progressRow}>
+                        <div className={styles.progressLabel}>No</div>
+                        <div className={styles.progressBar}>
+                            <div 
+                                className={`${styles.progressFill} ${styles.no}`} 
+                                style={{width: `${(voteStats.no / voteStats.total) * 100}%`}}
+                            ></div>
+                        </div>
+                        <div className={styles.progressValue}>{voteStats.no}</div>
+                    </div>
+                    <div className={styles.progressRow}>
+                        <div className={styles.progressLabel}>Abstain</div>
+                        <div className={styles.progressBar}>
+                            <div 
+                                className={`${styles.progressFill} ${styles.abstain}`} 
+                                style={{width: `${(voteStats.abstain / voteStats.total) * 100}%`}}
+                            ></div>
+                        </div>
+                        <div className={styles.progressValue}>{voteStats.abstain}</div>
+                    </div>
                 </div>
             </div>
 
