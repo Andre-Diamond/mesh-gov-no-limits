@@ -26,23 +26,23 @@
 
 .headerIcon {
     font-size: 1.75rem;
-    color: var(--status-blue);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .title {
     font-size: 1.75rem;
     font-weight: 600;
-    color: var(--text-color);
+    color: rgba(255, 255, 255, 0.9);
     margin: 0;
 }
 
 .title span {
-    color: var(--status-blue);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .subtitle {
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.6);
     margin: 0.25rem 0 0 0;
 }
 

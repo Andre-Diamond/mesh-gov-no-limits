@@ -1,6 +1,5 @@
 import React from 'react';
 import Navigation from './Navigation';
-import NavMetrics from './NavMetrics';
 import styles from '../styles/Layout.module.css';
 
 interface LayoutProps {
@@ -12,7 +11,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className={styles.container}>
             <div className={styles.sidebarContainer}>
                 <Navigation />
-                <NavMetrics />
             </div>
             <main className={styles.main}>
                 <div className={styles.content}>

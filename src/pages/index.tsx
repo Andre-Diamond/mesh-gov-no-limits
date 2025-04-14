@@ -5,9 +5,10 @@ import PageHeader from '../components/PageHeader';
 import StatusCard, { StatusIconType } from '../components/StatusCard';
 import SearchFilterBar from '../components/SearchFilterBar';
 import { dashboardFilterConfig } from '../config/filterConfig';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { CatalystProject, GovernanceVote } from '../types';
+import Image from 'next/image';
 
 // Simple number formatting function
 const formatNumber = (num: number): string => {
@@ -31,93 +32,33 @@ interface ProjectWithCompletion extends CatalystProject {
 
 // Component to display compact catalyst proposals overview
 const CatalystProposalsCard = ({ projects }: { projects: CatalystProject[] }) => {
-    const router = useRouter();
-
-    // Extract funding round from category (first 3 letters)
-    const getFundingRound = (category: string): string => {
-        const match = category.match(/^F(\d+)/);
-        return match ? `Fund ${match[1]}` : category.substring(0, 3);
-    };
-
-    // Calculate completion percentage for display
-    const calculateCompletion = (project: CatalystProject): number => {
-        if (project.projectDetails.milestones_qty === 0) return 0;
-        return Math.round((project.milestonesCompleted / project.projectDetails.milestones_qty) * 100);
-    };
-
-    // Get status icon color
-    const getStatusColor = (status: string): string => {
-        switch (status) {
-            case 'Completed': return styles.statusIconGreen;
-            case 'In Progress': return styles.statusIconBlue;
-            default: return styles.statusIconYellow;
-        }
-    };
-
-    // Handle row click
-    const handleRowClick = (projectId: number) => {
-        router.push(`/catalyst-proposals?search=${projectId}`);
-    };
+    // Calculate milestones progress for each project
+    const projectProgress = projects.map(project => ({
+        title: project.projectDetails.title,
+        progress: project.projectDetails.milestones_qty > 0
+            ? Math.round((project.milestonesCompleted / project.projectDetails.milestones_qty) * 100)
+            : 0
+    }));
 
     return (
         <div className={`${styles.statusItem} ${styles.catalystProposalsCard}`}>
             <div className={styles.statusItemContent}>
-                <div className={styles.statusItemTop}>
-                    <div className={styles.statusLabel}>
-                        <div className={styles.statusTitle}>
-                            Catalyst Proposals Overview
+                <div className={styles.description}>
+                    Project Milestones Progress
+                </div>
+                <div className={styles.progressBars}>
+                    {projectProgress.map((project, index) => (
+                        <div key={index} className={styles.progressRow}>
+                            <span className={styles.progressLabel}>{project.title}</span>
+                            <div className={styles.progressBar}>
+                                <div 
+                                    className={styles.progressFill}
+                                    style={{width: `${project.progress}%`}}
+                                />
+                            </div>
+                            <span className={styles.progressValue}>{project.progress}%</span>
                         </div>
-                    </div>
-                    <div className={`${styles.statusIcon} ${styles.statusIconBlue}`}></div>
-                </div>
-                <div className={styles.proposalsTable}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Fund</th>
-                                <th>Status</th>
-                                <th>Funding</th>
-                                <th>Completion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {projects.map((project) => (
-                                <tr
-                                    key={project.projectDetails.project_id}
-                                    onClick={() => handleRowClick(project.projectDetails.project_id)}
-                                    className={styles.clickableRow}
-                                >
-                                    <td className={styles.proposalTitle}>{project.projectDetails.title}</td>
-                                    <td>{getFundingRound(project.projectDetails.category)}</td>
-                                    <td>
-                                        <div className={styles.statusWithIcon}>
-                                            <div className={`${styles.statusIcon} ${getStatusColor(project.projectDetails.status)}`}></div>
-                                            <span>{project.projectDetails.status}</span>
-                                        </div>
-                                    </td>
-                                    <td>₳{formatNumber(project.projectDetails.budget)}</td>
-                                    <td>
-                                        <div className={styles.completionWrapper}>
-                                            <div
-                                                className={styles.completionBar}
-                                                style={{ width: `${calculateCompletion(project)}%` }}
-                                            />
-                                            <span>{calculateCompletion(project)}%</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className={styles.statusItemBottom}>
-                    <div className={styles.statusSubtext}>
-                        Showing all {projects.length} proposals
-                    </div>
-                    <Link href="/catalyst-proposals" className={styles.viewMore}>
-                        View details
-                    </Link>
+                    ))}
                 </div>
             </div>
         </div>
@@ -126,87 +67,77 @@ const CatalystProposalsCard = ({ projects }: { projects: CatalystProject[] }) =>
 
 // Component to display voting table
 const VotingTableCard = ({ votes }: { votes: GovernanceVote[] }) => {
-    const router = useRouter();
-
-    // Get vote icon color
-    const getVoteIconColor = (vote: string): string => {
-        switch (vote) {
-            case 'Yes': return styles.statusIconGreen;
-            case 'No': return styles.statusIconRed;
-            case 'Abstain': return styles.statusIconYellow;
-            default: return styles.statusIconBlue;
-        }
-    };
-
-    // Handle row click
-    const handleRowClick = (proposalId: string) => {
-        router.push(`/drep-voting?search=${proposalId}`);
+    // Calculate vote stats
+    const voteStats = {
+        total: votes.length,
+        yes: votes.filter(v => v.vote === 'Yes').length,
+        no: votes.filter(v => v.vote === 'No').length,
+        abstain: votes.filter(v => v.vote === 'Abstain').length,
     };
 
     return (
         <div className={`${styles.statusItem} ${styles.catalystProposalsCard}`}>
             <div className={styles.statusItemContent}>
-                <div className={styles.statusItemTop}>
-                    <div className={styles.statusLabel}>
-                        <div className={styles.statusTitle}>
-                            Voting Activity
+                <div className={styles.description}>
+                    Mesh DRep votes at Cardano's onchain Governance
+                </div>
+                <div className={styles.progressBars}>
+                    <div className={styles.progressRow}>
+                        <span className={styles.progressLabel}>Yes</span>
+                        <div className={styles.progressBar}>
+                            <div 
+                                className={`${styles.progressFill} ${styles.yes}`} 
+                                style={{width: `${(voteStats.yes / voteStats.total) * 100}%`}}
+                            ></div>
                         </div>
+                        <span className={styles.progressValue}>{voteStats.yes}</span>
                     </div>
-                    <div className={`${styles.statusIcon} ${styles.statusIconGreen}`}></div>
-                </div>
-                <div className={`${styles.proposalsTable} ${styles.votingTable}`}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Proposal</th>
-                                <th>Type</th>
-                                <th>Vote</th>
-                                <th>Date</th>
-                                <th>Epochs</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {votes.map((vote) => (
-                                <tr
-                                    key={vote.proposalId}
-                                    onClick={() => handleRowClick(vote.proposalId)}
-                                    className={styles.clickableRow}
-                                >
-                                    <td className={styles.proposalTitle}>{vote.proposalTitle}</td>
-                                    <td>{vote.proposalType}</td>
-                                    <td>
-                                        <div className={styles.statusWithIcon}>
-                                            <div className={`${styles.statusIcon} ${getVoteIconColor(vote.vote)}`}></div>
-                                            <span>{vote.vote}</span>
-                                        </div>
-                                    </td>
-                                    <td>{formatDate(vote.blockTime)}</td>
-                                    <td>{vote.proposedEpoch} - {vote.expirationEpoch}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className={styles.statusItemBottom}>
-                    <div className={styles.statusSubtext}>
-                        Showing all {votes.length} votes
+                    <div className={styles.progressRow}>
+                        <span className={styles.progressLabel}>No</span>
+                        <div className={styles.progressBar}>
+                            <div 
+                                className={`${styles.progressFill} ${styles.no}`} 
+                                style={{width: `${(voteStats.no / voteStats.total) * 100}%`}}
+                            ></div>
+                        </div>
+                        <span className={styles.progressValue}>{voteStats.no}</span>
                     </div>
-                    <Link href="/drep-voting" className={styles.viewMore}>
-                        View details
-                    </Link>
+                    <div className={styles.progressRow}>
+                        <span className={styles.progressLabel}>Abstain</span>
+                        <div className={styles.progressBar}>
+                            <div 
+                                className={`${styles.progressFill} ${styles.abstain}`} 
+                                style={{width: `${(voteStats.abstain / voteStats.total) * 100}%`}}
+                            ></div>
+                        </div>
+                        <span className={styles.progressValue}>{voteStats.abstain}</span>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-export default function Home() {
+export default function Dashboard() {
     const { meshData, catalystData, drepVotingData, isLoading, error, refetchData } = useData();
     const router = useRouter();
-    const [filteredVotes, setFilteredVotes] = useState<GovernanceVote[]>(drepVotingData?.votes || []);
-    const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>(catalystData?.catalystData?.projects || []);
+    const [filteredVotes, setFilteredVotes] = useState<GovernanceVote[]>([]);
+    const [filteredProjects, setFilteredProjects] = useState<CatalystProject[]>([]);
     const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
     
+    // Update filtered data when source data changes
+    useEffect(() => {
+        if (drepVotingData?.votes) {
+            setFilteredVotes(drepVotingData.votes);
+        }
+    }, [drepVotingData]);
+
+    useEffect(() => {
+        if (catalystData?.catalystData?.projects) {
+            setFilteredProjects(catalystData.catalystData.projects);
+        }
+    }, [catalystData]);
+
     if (isLoading) {
         return (
             <div className={styles.container}>
@@ -231,9 +162,10 @@ export default function Home() {
     const totalVotes = drepVotingData?.votes?.length || 0;
     const allVotes = drepVotingData?.votes || [];
 
-    // SDK download stats
-    const downloads = meshData?.currentStats?.npm?.downloads;
+    // SDK download stats - get last month's downloads
+    const monthlyDownloads = meshData?.currentStats?.npm?.downloads?.last_month || 0;
     const githubUsage = meshData?.currentStats?.github?.core_in_package_json || 0;
+    const activeContributors = meshData?.currentStats?.contributors?.unique_count || 0;
 
     // Calculate project categories
     const categories: Record<string, number> = {};
@@ -299,63 +231,123 @@ export default function Home() {
 
     return (
         <div className={styles.container}>
-            <PageHeader
-                title={<>Mesh Governance <span>Dashboard</span></>}
-                subtitle="Comprehensive overview of all MeshJS ecosystem activities"
-            />
-
-            <SearchFilterBar
-                config={dashboardFilterConfig}
-                onSearch={handleSearch}
-            />
-
-            {/* Top metrics */}
-            <div className={styles.statusList}>
-                <h2>Key Metrics</h2>
-
-                {/* Voting Card */}
-                <StatusCard
-                    title="Total Votes"
-                    value={totalVotes}
-                    iconType="green"
-                    subtitle={`Latest vote: ${allVotes[0] ? formatDate(allVotes[0].blockTime) : 'N/A'}`}
-                    href="/drep-voting"
+            <header className={styles.mainHeader}>
+                <Image
+                    src="/mesh-white-txt.png"
+                    alt="Mesh Logo"
+                    width={300}
+                    height={100}
+                    className={styles.meshLogo}
+                    priority
                 />
+            </header>
 
-                {/* Proposals Card */}
-                <StatusCard
-                    title="Catalyst Proposals"
-                    value={totalProposals}
-                    iconType="blue"
-                    subtitle={`${completedProposals} completed (${Math.round((completedProposals / totalProposals) * 100)}%)`}
-                    href="/catalyst-proposals"
-                />
+            <div className={styles.grid}>
+                {/* Voting Activity Section */}
+                <section className={`${styles.section} ${styles.votingActivity}`}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>Voting Activity</h2>
+                        <Image
+                            src="/Cardano-RGB_Logo-Icon-White.png"
+                            alt="Cardano Icon"
+                            width={32}
+                            height={32}
+                            className={`${styles.cardIcon} ${styles.iconGreen}`}
+                            priority
+                        />
+                    </div>
+                    <div className={styles.sectionContent}>
+                        <VotingTableCard votes={filteredVotes} />
+                    </div>
+                </section>
 
-                {/* SDK Downloads Card */}
-                <StatusCard
-                    title="SDK Downloads"
-                    value={downloads ? formatNumber(downloads.last_month) : 'N/A'}
-                    iconType="yellow"
-                    subtitle={`This month • ${githubUsage} projects using Mesh`}
-                    href="/mesh-stats"
-                />
+                {/* Catalyst Proposals Overview */}
+                <section className={`${styles.section} ${styles.proposalsOverview}`}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>Catalyst Proposals</h2>
+                        <Image
+                            src="/catalyst.png"
+                            alt="Catalyst Icon"
+                            width={32}
+                            height={32}
+                            className={`${styles.cardIcon} ${styles.iconBlue}`}
+                            priority
+                        />
+                    </div>
+                    <div className={styles.sectionContent}>
+                        <CatalystProposalsCard projects={filteredProjects} />
+                    </div>
+                </section>
+
+                {/* Downloads Section */}
+                <section className={`${styles.section} ${styles.downloads}`}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>Downloads</h2>
+                        <Image
+                            src="/download.png"
+                            alt="Downloads Icon"
+                            width={32}
+                            height={32}
+                            className={`${styles.cardIcon} ${styles.iconBlue}`}
+                            priority
+                        />
+                    </div>
+                    <div className={styles.sectionContent}>
+                        <StatusCard
+                            title="NPM Downloads"
+                            value={formatNumber(monthlyDownloads)}
+                            iconType="blue"
+                            subtitle="Monthly package downloads"
+                        />
+                    </div>
+                </section>
+
+                {/* Projects Section */}
+                <section className={`${styles.section} ${styles.useCases}`}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>Projects</h2>
+                        <Image
+                            src="/projects.png"
+                            alt="Projects Icon"
+                            width={32}
+                            height={32}
+                            className={`${styles.cardIcon} ${styles.iconGreen}`}
+                            priority
+                        />
+                    </div>
+                    <div className={styles.sectionContent}>
+                        <StatusCard
+                            title="GitHub Usage"
+                            value={formatNumber(githubUsage)}
+                            iconType="green"
+                            subtitle="Projects using Mesh"
+                        />
+                    </div>
+                </section>
+
+                {/* Contributors Section */}
+                <section className={`${styles.section} ${styles.contributors}`}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>Contributors</h2>
+                        <Image
+                            src="/ppl.png"
+                            alt="Contributors Icon"
+                            width={32}
+                            height={32}
+                            className={`${styles.cardIcon} ${styles.iconYellow}`}
+                            priority
+                        />
+                    </div>
+                    <div className={styles.sectionContent}>
+                        <StatusCard
+                            title="Active Contributors"
+                            value={formatNumber(activeContributors)}
+                            iconType="yellow"
+                            subtitle="GitHub contributors"
+                        />
+                    </div>
+                </section>
             </div>
-
-            {/* Voting Table Card */}
-            {filteredVotes.length > 0 && (
-                <div className={styles.statusList}>
-                    <h2>Voting Activity</h2>
-                    <VotingTableCard votes={filteredVotes} />
-                </div>
-            )}
-
-            {/* Catalyst Proposals Overview Card */}
-            {filteredProjects.length > 0 && (
-                <div className={styles.statusList}>
-                    <h2>Catalyst Proposals Overview</h2>
-                    <CatalystProposalsCard projects={filteredProjects} />
-                </div>
-            )}
         </div>
     );
 } 
