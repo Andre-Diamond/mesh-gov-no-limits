@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import styles from '../styles/MeshStats.module.css';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from 'recharts';
 import { YearlyStats, CurrentStats } from '../types';
 
 interface MonthlyDownload {
@@ -25,6 +25,70 @@ interface MeshStatsViewProps {
 const formatNumber = (num: number): string => {
     return new Intl.NumberFormat('en-US').format(num);
 };
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className={styles.customTooltip}>
+                <p className={styles.tooltipLabel}>{label}</p>
+                <p className={styles.tooltipValue}>
+                    {formatNumber(payload[0].value)} downloads
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
+
+const barColor = '#FFFFFF';
+
+const CustomBarChart = ({ data, chartId }: { data: any[], chartId: string }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} barGap={8} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+            <defs>
+                <linearGradient id={`barGradient-${chartId}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.5" />
+                </linearGradient>
+            </defs>
+            <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="rgba(255, 255, 255, 0.03)"
+                vertical={false}
+            />
+            <XAxis 
+                dataKey="name"
+                axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 11 }}
+                tickLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                dy={8}
+            />
+            <YAxis
+                axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                tick={{ fill: 'rgba(255, 255, 255, 0.6)', fontSize: 11 }}
+                tickLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                tickFormatter={(value) => value >= 1000 ? `${value/1000}k` : value}
+            />
+            <Tooltip 
+                content={<CustomTooltip />}
+                cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
+            />
+            <Bar 
+                dataKey="downloads" 
+                fill={`url(#barGradient-${chartId})`}
+                radius={[4, 4, 0, 0]}
+                maxBarSize={40}
+            >
+                {data.map((entry, index) => (
+                    <Cell 
+                        key={`cell-${index}`}
+                        fill={`url(#barGradient-${chartId})`}
+                    />
+                ))}
+            </Bar>
+        </BarChart>
+    </ResponsiveContainer>
+);
 
 const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats, filteredStats }) => {
     // Determine if we're showing filtered data or all data
@@ -108,38 +172,20 @@ const MeshStatsView: FC<MeshStatsViewProps> = ({ currentStats, yearlyStats, filt
                 </div>
             )}
 
-            {packageData.length > 0 && (
-                <div className={styles.chartSection}>
-                    <h2>Package Downloads {isFiltered ? '(Filtered)' : '(Last Month)'}</h2>
-                    <div className={styles.chart}>
-                        <ResponsiveContainer width="100%" height={400}>
-                            <BarChart data={packageData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="downloads" fill="#4f46e5" />
-                            </BarChart>
-                        </ResponsiveContainer>
+            {packageData.length > 0 && monthlyData.length > 0 && (
+                <div className={styles.chartsGrid}>
+                    <div className={styles.chartSection}>
+                        <h2>Package Downloads {isFiltered ? '(Filtered)' : '(Last 12 Months)'}</h2>
+                        <div className={styles.chart}>
+                            <CustomBarChart data={packageData} chartId="package" />
+                        </div>
                     </div>
-                </div>
-            )}
 
-            {monthlyData.length > 0 && (
-                <div className={styles.chartSection}>
-                    <h2>meshsdk/core Monthly Downloads {isFiltered ? '(Filtered)' : `(${latestYear})`}</h2>
-                    <div className={styles.chart}>
-                        <ResponsiveContainer width="100%" height={400}>
-                            <BarChart data={monthlyData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="downloads" fill="#4f46e5" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <div className={styles.chartSection}>
+                        <h2>Monthly Downloads {isFiltered ? '(Filtered)' : `(${latestYear})`}</h2>
+                        <div className={styles.chart}>
+                            <CustomBarChart data={monthlyData} chartId="monthly" />
+                        </div>
                     </div>
                 </div>
             )}
